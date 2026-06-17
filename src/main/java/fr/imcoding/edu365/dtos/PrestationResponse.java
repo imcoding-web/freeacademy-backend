@@ -4,9 +4,13 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import fr.imcoding.edu365.client.dtos.response.PrestationMeetingResponse;
 import fr.imcoding.edu365.enumeration.PrestationStatus;
 import fr.imcoding.edu365.persistence.entities.PrestationMeeting;
+
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+
+import fr.imcoding.edu365.utils.Constants;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -30,6 +34,11 @@ public class PrestationResponse {
   private Date markAsSolvedDate;
 
   private PrestationMeetingResponse prestationMeeting;
+
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = Constants.DEFAULT_TIMEZONE)
+  private LocalDateTime date;
+
+  private boolean live;
 
 
 }

@@ -14,11 +14,13 @@ import fr.imcoding.edu365.dtos.UserDetails;
 import fr.imcoding.edu365.dtos.UserSkillsDto;
 import fr.imcoding.edu365.enumeration.AccountStatus;
 import fr.imcoding.edu365.enumeration.EmailContext;
+import fr.imcoding.edu365.enumeration.PackageStatus;
 import fr.imcoding.edu365.enumeration.RoleCode;
 import fr.imcoding.edu365.exceptions.NotAllowedOperationException;
 import fr.imcoding.edu365.persistence.entities.*;
 import fr.imcoding.edu365.persistence.repositories.InformationGiverRepository;
 import fr.imcoding.edu365.persistence.repositories.InformationSeekerRepository;
+import fr.imcoding.edu365.persistence.repositories.PackageSubscriptionRepository;
 import fr.imcoding.edu365.persistence.repositories.UserRepository;
 import fr.imcoding.edu365.utils.Constants;
 import fr.imcoding.edu365.utils.SecurityUtil;
@@ -59,6 +61,8 @@ public class UserService {
   private final PasswordEncoder encoder;
 
   private final ResetPasswordService resetPasswordService;
+
+  private final PackageSubscriptionRepository packageSubscriptionRepository;
 
 
 
@@ -264,5 +268,9 @@ public List<User> getUserDetailsyRole(RoleCode roleCode){
       return StudentExsitVerificationResponse.builder().exist(false).build();
     return new StudentExsitVerificationResponse(true, student.getUserFirstName(), student.getUserLastName(),
         student.getUserFirstName() + " " + student.getUserLastName(),student.getCurrentLevel()!=null?skillAreaMapper.toSkillAreaDto(student.getCurrentLevel()):null,student.getUuid());
+  }
+
+  public List<InformationSeeker> getStudentsWithLevel(String skillAreaCode, String sectionCode) {
+    return informationSeekerRepository.findBycurrentLevelSkillAreaCodeAndCurrentLevelSectionCodeAndIsEmailverifiedTrue(skillAreaCode, sectionCode);
   }
 }

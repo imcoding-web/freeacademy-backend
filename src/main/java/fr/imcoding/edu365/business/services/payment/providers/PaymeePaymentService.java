@@ -5,12 +5,15 @@ import fr.imcoding.edu365.business.ext.paymee.request.PaymeeTokenRequest;
 import fr.imcoding.edu365.business.ext.paymee.response.PaymeeCheckPaymentResponse;
 import fr.imcoding.edu365.business.ext.paymee.response.PaymeeResponse;
 import fr.imcoding.edu365.business.services.OfferService;
+import fr.imcoding.edu365.business.services.PackageSubscriptionService;
 import fr.imcoding.edu365.business.services.PaymeeInprogressTransactionsService;
 import fr.imcoding.edu365.business.services.PaymentService;
+import fr.imcoding.edu365.client.dtos.request.PackageSubscriptionRequest;
 import fr.imcoding.edu365.dtos.ext.TransationOrder;
 import fr.imcoding.edu365.enumeration.PaymentType;
 import fr.imcoding.edu365.persistence.entities.Offer;
 import fr.imcoding.edu365.persistence.entities.PaymeeInProgressTransaction;
+import fr.imcoding.edu365.persistence.entities.SkillAreaPackage;
 import fr.imcoding.edu365.persistence.repositories.PaymeeInprogressTransactionsRepository;
 import lombok.RequiredArgsConstructor;
 import net.minidev.json.JSONObject;
@@ -41,17 +44,21 @@ public class PaymeePaymentService {
 
 private final OfferService offerService;
   private final PaymentService paymentService;
+  private final PackageSubscriptionService packageSubscriptionService;
 
 private final PaymeeInprogressTransactionsService paymeeInprogressTransactionsService;
 
 
 
-  public TransationOrder getRedirectionPaymentUrl(String orderId) {
-    Offer offer = offerService.getOfferById(orderId);
+  public TransationOrder getRedirectionPaymentUrl(double amount, String orderIdentifier) {
+    //Offer offer = offerService.getOfferById(orderId);
      JSONObject personJsonObject = new JSONObject();
-    personJsonObject.put("amount", offer.getOfferPriceToPay());
+    //personJsonObject.put("amount", offer.getOfferPriceToPay());
+      personJsonObject.put("amount", amount);
     personJsonObject.put("vendor", vendor);
-    personJsonObject.put("note", "Order #"+offer.getUniqueIdentifier());
+    //personJsonObject.put("note", "Order #"+offer.getUniqueIdentifier());
+    personJsonObject.put("note", "Order #"+orderIdentifier);
+
     HttpHeaders headers = new HttpHeaders();
     headers.add("Content-Type", "application/json");
     headers.add("Authorization", "Token "+token);
@@ -67,13 +74,21 @@ private final PaymeeInprogressTransactionsService paymeeInprogressTransactionsSe
       e.printStackTrace();
       return null;
     }
-    TransationOrder transationOrder=new TransationOrder();
-    transationOrder.setAmoount(result.getData().getAmount());
-    transationOrder.setToken(result.getData().getToken());
-    transationOrder.setRedirectUrl(requestCheckPaymentUrl.concat(result.getData().getToken()));
-    paymeeInprogressTransactionsService.savePaymeeTransaction(offer,transationOrder.getToken());
-    return transationOrder;
+    return saveNewTransactionOrder(result.getData().getAmount(),result.getData().getToken());
   }
+
+  private TransationOrder saveNewTransactionOrder(double amount, String token) {
+      TransationOrder transationOrder=new TransationOrder();
+      transationOrder.setAmoount(amount);
+      transationOrder.setToken(token);
+      transationOrder.setRedirectUrl(requestCheckPaymentUrl.concat(token));
+
+      return transationOrder;
+  }
+   public  PaymeeInProgressTransaction savePaymeeTransaction(Offer offer, SkillAreaPackage pack, String token) {
+      return  paymeeInprogressTransactionsService.savePaymeeTransaction(offer, pack , token);
+    }
+
 
 
   public PaymeeCheckPaymentResponse checkTransaction(String tokenRequest) {
@@ -92,8 +107,15 @@ private final PaymeeInprogressTransactionsService paymeeInprogressTransactionsSe
     try {
       result = new ObjectMapper().readValue(response.getBody(),PaymeeCheckPaymentResponse.class);
       if(result.getData()!=null && result.getData().isPayment_status()){
-        Offer offer=paymeeInprogressTransactionsService.getByToken(result.getData().getToken()).getOffer();
-        paymentService.savePaymentOperation(offer,PaymentType.PAYMEE);
+          PaymeeInProgressTransaction paymeeTransaction = paymeeInprogressTransactionsService.getByToken(result.getData().getToken());
+          // On va traiter uniquement le paiement des abonnements
+          // A RAFFINER POUR SUPPORTER LE PAIEMENT POUR UN SEUL MATIERE: ACTUELLEMENT LE MATIERE EST FORCE A NULL POU DIRE QUE LE PAIEMENT EST POUR TOUT LE PACK
+            if (paymeeTransaction != null && paymeeTransaction.getPack() != null) {
+                PackageSubscriptionRequest subscription = new PackageSubscriptionRequest(paymeeTransaction.getUser().getUuid(), 1, paymeeTransaction.getPack().getPackageType(), null);
+                packageSubscriptionService.addPackageSubscription(subscription);
+            }
+        //Offer offer=paymeeInprogressTransactionsService.getByToken(result.getData().getToken()).getOffer();
+        //paymentService.savePaymentOperation(offer,PaymentType.PAYMEE);
       }
     } catch (Exception e) {
       e.printStackTrace();

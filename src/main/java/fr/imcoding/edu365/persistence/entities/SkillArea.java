@@ -1,10 +1,15 @@
 package fr.imcoding.edu365.persistence.entities;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "edu365_skill_area")
@@ -17,6 +22,12 @@ public class SkillArea extends BaseEntity {
 
   private String skillAreaLabel;
   private String skillAreaCode;
+
+  private Boolean shouldBeDisplayed;
+
+  @ManyToMany
+  @LazyCollection(LazyCollectionOption.FALSE)
+  private List<SkillAreaSection> sections = new ArrayList<>();
 
 
 }

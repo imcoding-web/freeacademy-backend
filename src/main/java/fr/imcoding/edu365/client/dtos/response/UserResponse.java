@@ -1,8 +1,10 @@
 package fr.imcoding.edu365.client.dtos.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import fr.imcoding.edu365.dtos.AddressDto;
 import fr.imcoding.edu365.dtos.MediaDetails;
+import fr.imcoding.edu365.enumeration.PackageType;
 import java.util.Date;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -12,6 +14,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserResponse {
 
   private UUID userUuid;
@@ -24,4 +27,6 @@ public class UserResponse {
   private Date userBirthDate;
   private AddressDto userAddress;
   private MediaDetails userProfilePicture;
+  private Boolean hasAnActivePack; // if it is student else null
+  private PackageType packageType;
 }

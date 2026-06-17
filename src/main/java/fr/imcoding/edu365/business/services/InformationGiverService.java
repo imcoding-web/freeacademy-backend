@@ -271,6 +271,17 @@ public class InformationGiverService {
 
 	}
 
+	public void initiateBankdata(UUID teacherId) {
+		InformationGiver teacher = (InformationGiver) userService.getUserByUUID(teacherId);
+		UserBankData userBankData = new UserBankData();
+			userBankData.setAccumulatedBalance(0);
+			userBankData.setUnpaidAccumulatedBalance(0);
+			userBankData.setUser(teacher);
+			userBankDataService.saveUserBankData(userBankData);
+
+	}
+
+
 	public PositionResponse getUserPosition() {
 		InformationGiver currentUser = (InformationGiver) userService.getCurrentUser();
 		return positionRequestMapper.toPositionDetailsResponse(currentUser);
@@ -591,8 +602,12 @@ public class InformationGiverService {
 		Skill assignedCourse = skillService.findByCode(assignedCourseCode);
 		
 		informationGiver.getSkills().add(assignedCourse);
-		
-		informationGiverRepository.save(informationGiver);
+
+		informationGiver = informationGiverRepository.save(informationGiver);
+
+		// Ajouter les informations bancaires
+		initiateBankdata(informationGiver.getUuid());
+
 		
 		//supprimer le request une fois le compte est valdié
 		teacherRegisterRequestRepository.delete(request);

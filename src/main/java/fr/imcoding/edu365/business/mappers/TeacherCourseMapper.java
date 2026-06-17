@@ -1,5 +1,9 @@
 package fr.imcoding.edu365.business.mappers;
 
+import fr.imcoding.edu365.persistence.entities.SkillSubscription;
+import fr.imcoding.edu365.persistence.repositories.SkillSubscriptionRepository;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
@@ -26,12 +30,15 @@ import lombok.RequiredArgsConstructor;
 public class TeacherCourseMapper {
   private final SkillMapper skillMapper;
   private final SkillAreaMapper skillAreaMapper;
+  private final SkillAreaSectionMapper skillAreaSectionMapper;
   private final MediaDatailsMapper mediaMapper;
   private final UserMapper userMapper;
   private final UserService userService;
   private final PackageSubscriptionRepository subscriptionRepository;
+  private final SkillSubscriptionRepository skillSubscriptionRepository;
 
   public  TeacherCourseResponse toTeacherCourseResponse(TeacherCourse teacherCourse){
+	  if(teacherCourse == null) return null;
     return TeacherCourseResponse.builder().courseUuid(teacherCourse.getUuid())
         .title(teacherCourse.getTitle())
         .type(teacherCourse.getType())
@@ -40,8 +47,11 @@ public class TeacherCourseMapper {
         .quarter(teacherCourse.getQuarter())
         .skill(skillMapper.toSkillDto(teacherCourse.getSkill()))
         .skillArea(skillAreaMapper.toSkillAreaDto(teacherCourse.getSkillArea()))
-        .medias(teacherCourse.getMedias().stream().map(media->mediaMapper.toMediaDetails(media)).collect(
-            Collectors.toList())).isPremium(teacherCourse.getIsPremium()).build();
+			.skillAreaSection(skillAreaSectionMapper.toSkillAreaSectionDto(teacherCourse.getSkillAreaSection()))
+        .medias(teacherCourse.getMedias().stream().map(mediaMapper::toMediaDetails).collect(
+            Collectors.toList())).isPremium(teacherCourse.getIsPremium())
+			.shouldBeDisplayed(teacherCourse.getShouldBeDisplayed())
+			.build();
   }
   
 	public TeacherCourseResponse toTeacherCourseResponse(TeacherCourse teacherCourse,
@@ -84,20 +94,30 @@ public class TeacherCourseMapper {
         .courseUuid(teacherCourse.getUuid())
         .skill(skillMapper.toSkillDto(teacherCourse.getSkill()))
         .skillArea(skillAreaMapper.toSkillAreaDto(teacherCourse.getSkillArea()))
+			.isPremium(teacherCourse.getIsPremium())
         .courseCreator(teacherCourse.getCreator()!=null?CourseCreatorDto.builder()
-            .userDetails(userMapper.toUserDetails(teacherCourse.getCreator()))
+            .userDetails(userMapper.toTeacherDetails(teacherCourse.getCreator()))
             .skill(teacherCourse.getCreator() != null ? 
             		skillMapper.toSkillDto(teacherCourse.getCreator().getSkills().stream().findFirst().orElse(null))
             		: null)
             .build():null)
-
+			.section(teacherCourse.getSkillAreaSection().getLabel())
         .build();
   }
 
   public TeacherCourseDetails toTeacherCourseDetailsFilter(TeacherCourse teacherCourse){
 	  InformationSeeker student = (InformationSeeker) userService.getCurrentUser();
+	  // Tester si l'etudiante st inscrit à un apck en entier => il a acces à toutes les séances
 		boolean hasSubscription = subscriptionRepository.existsByStudentAndSubscriptionStatus(student,
 				PackageStatus.ACTIVE);
+		// Si non, on va vérifier si l'étudiant est inscrit à un matiére bien donné
+	  if(!hasSubscription) {
+		  List<SkillSubscription> subscriptionsToSkills = skillSubscriptionRepository.findByStudentAndSubscriptionStatus(student,
+				  PackageStatus.ACTIVE);
+		  if(!subscriptionsToSkills.isEmpty()) {
+			  hasSubscription = subscriptionsToSkills.stream().anyMatch(skillSubscription -> skillSubscription.getSkill().getSkillCode().equalsIgnoreCase(teacherCourse.getSkill().getSkillCode()));
+		  }
+	  }
 		
     return TeacherCourseDetails.builder().title(teacherCourse.getTitle())
         .courseUuid(teacherCourse.getUuid())

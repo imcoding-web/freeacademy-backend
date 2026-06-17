@@ -4,6 +4,7 @@ import fr.imcoding.edu365.client.dtos.response.ExpertPaymentResponse;
 import java.util.List;
 import java.util.UUID;
 
+import fr.imcoding.edu365.enumeration.PackageType;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -58,6 +59,16 @@ public class PaymentController {
 	public ResponseEntity<TransationOrder> getRedirectionPaymentUrl(@RequestParam("payment-type") PaymentType paymentType,
 			@RequestParam("order-id") String orderId) {
 		TransationOrder transactionOrder =  extPaymentservice.getRedirectionPaymentUrl(paymentType, orderId);
+		if(transactionOrder == null)
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		else
+			return ResponseEntity.ok(transactionOrder);
+	}
+
+	@GetMapping("/pay-package")
+	public ResponseEntity<TransationOrder> getRedirectionPaymentUrlToPayPackage(@RequestParam(value = "payment-type", defaultValue = "PAYMEE") PaymentType paymentType,
+																	@RequestParam("pack") PackageType packageType) throws Exception {
+		TransationOrder transactionOrder =  extPaymentservice.getRedirectionPaymentUrlToPayPackage(paymentType, packageType);
 		if(transactionOrder == null)
 			return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 		else

@@ -33,12 +33,10 @@ public class PackageSubscription extends BaseEntity {
   @Enumerated(EnumType.STRING)
   private PackageStatus subscriptionStatus;
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Africa/Tunis")
-  @Temporal(TemporalType.DATE)
-  private Date startDate;
+  private LocalDate startDate;
 
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Africa/Tunis")
-  @Temporal(TemporalType.DATE)
-  private Date endDate;
+  private LocalDate endDate;
   @ManyToOne(cascade = CascadeType.MERGE)
   private InformationSeeker student;
 

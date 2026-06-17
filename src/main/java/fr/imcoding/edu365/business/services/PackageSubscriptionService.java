@@ -1,8 +1,11 @@
 package fr.imcoding.edu365.business.services;
 
 import fr.imcoding.edu365.business.mappers.PackageSubscriptionMapper;
+import fr.imcoding.edu365.business.services.email.EmailService;
 import fr.imcoding.edu365.client.dtos.request.PackageSubscriptionRequest;
 import fr.imcoding.edu365.client.dtos.response.PackageSubscriptionResponse;
+import fr.imcoding.edu365.dtos.EmailDto;
+import fr.imcoding.edu365.enumeration.EmailContext;
 import fr.imcoding.edu365.enumeration.PackageStatus;
 import fr.imcoding.edu365.enumeration.PackageType;
 import fr.imcoding.edu365.persistence.entities.InformationSeeker;
@@ -10,12 +13,15 @@ import fr.imcoding.edu365.persistence.entities.PackageSubscription;
 import fr.imcoding.edu365.persistence.entities.SkillArea;
 import fr.imcoding.edu365.persistence.entities.SkillAreaPackage;
 import fr.imcoding.edu365.persistence.repositories.PackageSubscriptionRepository;
+import fr.imcoding.edu365.utils.Constants;
 import fr.imcoding.edu365.utils.DatesUtils;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -30,13 +36,15 @@ public class PackageSubscriptionService {
   private final PackageSubscriptionRepository subscriptionRepository;
   private final PackageSubscriptionMapper packageSubscriptionMapper;
 
+  private final EmailService emailService;
+
 
   private final SkillAreaPackageService skillAreaPackageService;
 
   public PackageSubscription addPackageSubscription(PackageSubscriptionRequest subscriptionRequest){
     InformationSeeker student=(InformationSeeker)userService.getUserByUUID(subscriptionRequest.getStudentUuid());
     PackageSubscription packageSubscription=new PackageSubscription();
-    packageSubscription.setStartDate(new Date());
+    packageSubscription.setStartDate(LocalDate.now());
     packageSubscription.setEndDate(DatesUtils.calculateEndDate(packageSubscription.getStartDate(),subscriptionRequest.getMonthsNumber()));
     packageSubscription.setSubscriptionStatus(PackageStatus.ACTIVE);
     packageSubscription.setStudent(student);
@@ -46,9 +54,35 @@ public class PackageSubscriptionService {
               subscriptionRequest.getPackageType()));
     }
 
+    Map<String, Object> maps = new HashMap<>();
+    List<String> destinations = Stream.of(student.getUserEmail())
+            .collect(Collectors.toList());
+    maps.put("packType", subscriptionRequest.getPackageType().toString());
+    maps.put("packLevel", student.getCurrentLevel().getSkillAreaLabel());
+    maps.put("packSection", student.getCurrentLevelSection() != null ? student.getCurrentLevelSection().getLabel(): "Non Défini");
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+    maps.put("endDate", formatter.format(packageSubscription.getEndDate()));
+    maps.put("userFullName", student.getUserLastName() + " " + student.getUserFirstName());
+    sendNotificationEmail(maps, destinations, EmailContext.NOTIF_USER_PACK_SUBSCRIPTION);
+
     return subscriptionRepository.save(packageSubscription);
 
   }
+
+  public void sendNotificationEmail(Map<String, Object> maps, List<String> destinations,
+                                    EmailContext emailContext) {
+    EmailDto emailDto =
+            new EmailDto();
+    if (emailContext == EmailContext.NOTIF_USER_PACK_SUBSCRIPTION) {
+      emailDto =
+              new EmailDto(
+                      Constants.MAIL_SUBJECT_NOTIF_USER_PACK_SUBSCRIPTION, "notif-user-pack-subscription-sucess.html", maps,
+                      new HashMap<>(),EmailContext.NOTIF_USER_PACK_SUBSCRIPTION);
+    }
+    emailService.sendMail(emailDto, destinations);
+  }
+
+
 
 
   public List<PackageSubscriptionResponse> getAllPackageSubscription(PackageType packageType){

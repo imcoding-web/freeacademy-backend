@@ -28,6 +28,9 @@ public class PaymeeInProgressTransaction extends BaseEntity {
   private Offer offer;
 
   @ManyToOne(cascade = CascadeType.MERGE)
+  private SkillAreaPackage pack;
+
+  @ManyToOne(cascade = CascadeType.MERGE)
   private User user;
   
   @Enumerated(EnumType.STRING)

@@ -1,24 +1,22 @@
 package fr.imcoding.edu365.persistence.entities;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import fr.imcoding.edu365.enumeration.CourseType;
 import fr.imcoding.edu365.enumeration.Quarter;
+
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
+
+import fr.imcoding.edu365.utils.Constants;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+import org.springframework.data.annotation.CreatedDate;
 
 /**
  * @author Rokaya
@@ -43,16 +41,23 @@ public class TeacherCourse extends BaseEntity {
 	private Quarter quarter;
 
 	@Fetch(value = FetchMode.SUBSELECT)
-	@OneToMany(cascade = { CascadeType.MERGE, CascadeType.REMOVE }, fetch = FetchType.EAGER)
+	@ManyToMany(cascade = { CascadeType.MERGE}, fetch = FetchType.EAGER)
 	private List<Media> medias = new ArrayList<>();
 
 	@ManyToOne
 	private SkillArea skillArea;
 
 	@ManyToOne
+	private SkillAreaSection skillAreaSection;
+
+	//@ManyToMany
+	//private List<SkillAreaSection> skillAreaSections = new ArrayList<>();
+
+	@ManyToOne
 	private Skill skill;
 
-	@Column(columnDefinition="bit default 0")
 	private Boolean isPremium;
+
+	private Boolean shouldBeDisplayed;
 
 }

@@ -3,6 +3,7 @@ package fr.imcoding.edu365.persistence.specifications;
 import fr.imcoding.edu365.dtos.TeacherCourseSearchCriteria;
 import fr.imcoding.edu365.persistence.entities.Skill;
 import fr.imcoding.edu365.persistence.entities.SkillArea;
+import fr.imcoding.edu365.persistence.entities.SkillAreaSection;
 import fr.imcoding.edu365.persistence.entities.TeacherCourse;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -32,6 +33,13 @@ public class TeacherCourseSpecification {
         predicates.add(skillSkillAreaJoin.get("skillAreaCode").in(searchCriteria.getSkillArea()));
        // predicates.add(builder.equal(root.get("skillArea"), searchCriteria.getSkillArea()));
       }
+      if (searchCriteria.getSkillAreaSection() != null && !searchCriteria.getSkillAreaSection().isEmpty()) {
+        //Join<TeacherCourse, SkillArea> expertSkillAreaJoin = root.join("skills", JoinType.INNER);
+        Join<TeacherCourse, SkillAreaSection> skillSkillAreaSectionJoin = root.join("skillAreaSection", JoinType.INNER);
+
+        predicates.add(skillSkillAreaSectionJoin.get("code").in(searchCriteria.getSkillAreaSection()));
+        // predicates.add(builder.equal(root.get("skillArea"), searchCriteria.getSkillArea()));
+      }
       // Add your conditions based on the search criteria
       if (searchCriteria.getSkill() != null && !searchCriteria.getSkill().isEmpty()) {
         Join<TeacherCourse, Skill> courseSkillJoin = root.join("skill", JoinType.INNER);
@@ -45,7 +53,9 @@ public class TeacherCourseSpecification {
       if (searchCriteria.getQuarter() != null) {
         predicates.add(builder.equal(root.get("quarter"), searchCriteria.getQuarter()));
       }
-
+      if(Boolean.TRUE.equals(searchCriteria.getShouldBeDisplayed())) {
+        predicates.add(builder.isTrue(root.get("shouldBeDisplayed")));
+      }
       // Combine predicates using AND
       return builder.and(predicates.toArray(new Predicate[0]));
 

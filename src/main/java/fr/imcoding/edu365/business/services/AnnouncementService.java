@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
+import fr.imcoding.edu365.business.services.files.FilesStorageService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,7 +23,7 @@ import fr.imcoding.edu365.business.mappers.SkillAreaMapper;
 import fr.imcoding.edu365.business.mappers.SkillMapper;
 import fr.imcoding.edu365.business.mappers.UserMapper;
 import fr.imcoding.edu365.business.services.email.EmailService;
-import fr.imcoding.edu365.business.services.files.IFileService;
+import fr.imcoding.edu365.business.services.files.DBFileStorageService;
 import fr.imcoding.edu365.client.dtos.request.AnnouncementRequest;
 import fr.imcoding.edu365.client.dtos.response.AnnouncementFiltredResponseDto;
 import fr.imcoding.edu365.client.dtos.response.AnnouncementResponse;
@@ -68,7 +69,7 @@ public class AnnouncementService {
 
   private final UserService userService;
   private final MediaDatailsMapper mediaDatailsMapper;
-  private final IFileService dBFileStorageService;
+  private final FilesStorageService dBFileStorageService;
   private final MediaService mediaService;
   private final UserMapper userMapper;
   private final EmailService emailService;
@@ -189,7 +190,7 @@ public class AnnouncementService {
     if (!mediaList.isEmpty()) {
       mediaList.forEach(media -> {
         mediaService.deleteMedia(media.getId());
-        dBFileStorageService.deleteFile(media);
+        dBFileStorageService.deleteFile(media.getMediaLabel());
       });
 
     }
@@ -224,6 +225,7 @@ public class AnnouncementService {
   }
 
 
+  @Transactional
   public PageDto<AnnouncementFiltredResponseDto> getAnnouncementPaginated(
       Integer pageIndex,
       Integer offset,

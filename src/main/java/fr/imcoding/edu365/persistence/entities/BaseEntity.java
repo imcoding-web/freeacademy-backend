@@ -31,7 +31,7 @@ public class BaseEntity implements Serializable {
   private static final long serialVersionUID = 1L;
 
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = Constants.DEFAULT_TIMEZONE)
-  @Column(nullable = false, updatable = false)
+  @Column(nullable = false)
   @CreatedDate
   protected Date createdAt;
 

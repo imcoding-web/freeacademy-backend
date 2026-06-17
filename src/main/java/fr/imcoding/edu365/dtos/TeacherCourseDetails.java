@@ -34,5 +34,6 @@ public class TeacherCourseDetails {
   private LessonCorrectionResponse lessonCorrection;
   private Boolean isPremium;
   private Boolean canBeOpened;
+  private String section;
 
 }

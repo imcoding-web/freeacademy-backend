@@ -1,17 +1,10 @@
 package fr.imcoding.edu365.business.services;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import fr.imcoding.edu365.business.mappers.MediaMapper;
 import fr.imcoding.edu365.business.mappers.ProjectMapper;
 import fr.imcoding.edu365.business.mappers.SkillMapper;
-import fr.imcoding.edu365.business.services.files.IFileService;
+import fr.imcoding.edu365.business.services.files.DBFileStorageService;
+import fr.imcoding.edu365.business.services.files.FilesStorageService;
 import fr.imcoding.edu365.client.dtos.request.ProjectRequest;
 import fr.imcoding.edu365.client.dtos.response.ProjectDetails;
 import fr.imcoding.edu365.dtos.MediaDto;
@@ -21,8 +14,15 @@ import fr.imcoding.edu365.persistence.entities.InformationGiver;
 import fr.imcoding.edu365.persistence.entities.Media;
 import fr.imcoding.edu365.persistence.entities.Project;
 import fr.imcoding.edu365.persistence.repositories.ProjectRepository;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 
 /**
@@ -39,7 +39,7 @@ public class ProjectService {
   private final ProjectMapper projectMapper;
   private final MediaMapper mediaMapper;
   private final ProjectRepository projectRepository;
-  private final IFileService dBFileStorageService;
+  private final FilesStorageService dBFileStorageService;
   private final MediaService mediaService;
 
 
@@ -108,7 +108,7 @@ public class ProjectService {
    if (!mediaListToDelete.isEmpty()) {
       mediaListToDelete.forEach(media -> {
         mediaService.deleteMedia(media.getId());
-        dBFileStorageService.deleteFile(media);
+        dBFileStorageService.deleteFile(media.getMediaLabel());
       });
 
       projectToUpdate.getMedias().removeAll(mediaListToDelete);
@@ -144,7 +144,7 @@ public class ProjectService {
       projectRepository.delete(projectTodelete);
       // remove media from disk
       projectMedia.stream().forEach(media -> {
-        dBFileStorageService.deleteFile(media);
+        dBFileStorageService.deleteFile(media.getMediaLabel());
       });
     }
   }

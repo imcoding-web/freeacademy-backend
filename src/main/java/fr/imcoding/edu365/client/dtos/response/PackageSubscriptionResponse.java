@@ -3,6 +3,8 @@ package fr.imcoding.edu365.client.dtos.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import fr.imcoding.edu365.enumeration.PackageStatus;
 import fr.imcoding.edu365.enumeration.PackageType;
+
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -22,9 +24,9 @@ public class PackageSubscriptionResponse {
   private UUID uuid;
   private PackageType packageType;
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-  private Date startDate;
+  private LocalDate startDate;
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-  private Date endDate;
+  private LocalDate endDate;
   private PackageStatus subscriptionStatus;
   private StudentResponse student;
 

@@ -1,7 +1,13 @@
 package fr.imcoding.edu365.config;
 
-import javax.mail.internet.AddressException;
-
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.regions.Regions;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import fr.imcoding.edu365.business.services.files.FilesStorageService;
+import fr.imcoding.edu365.business.services.files.LocalFileService;
+import fr.imcoding.edu365.business.services.files.RemoteFileService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,15 +15,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.regions.Regions;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import javax.mail.internet.AddressException;
 
-import fr.imcoding.edu365.business.services.files.IFileService;
-import fr.imcoding.edu365.business.services.files.LocalFileService;
-import fr.imcoding.edu365.business.services.files.RemoteFileService;
 
 @Configuration
 public class FileStorageConfiguration {
@@ -34,20 +33,28 @@ public class FileStorageConfiguration {
 	@ConditionalOnProperty(name = "storage.remote", havingValue = "true", matchIfMissing = false)
 	public AmazonS3 getAmazonS3() throws AddressException {
 		BasicAWSCredentials awsCreds = new BasicAWSCredentials(spaceKey, spaceSecret);
-		return AmazonS3ClientBuilder.standard().withRegion(Regions.EU_WEST_1)
+		return AmazonS3ClientBuilder.standard().withRegion(Regions.CA_CENTRAL_1)
 				.withCredentials(new AWSStaticCredentialsProvider(awsCreds)).build();
 	}
 
 	@Bean
 	@ConditionalOnProperty(name = "storage.remote", havingValue = "true", matchIfMissing = false)
-	public IFileService getRemoteFileService() {
+	public AmazonS3 s3Client() {
+		return AmazonS3ClientBuilder.standard()
+				.withRegion("eu-west-1")
+				.build();
+	}
+
+	@Bean
+	@ConditionalOnProperty(name = "storage.remote", havingValue = "true", matchIfMissing = false)
+	public FilesStorageService getRemoteFileService() {
 		return new RemoteFileService();
 	}
 
 	@Bean
 	@ConditionalOnProperty(name = "storage.remote", havingValue = "false", matchIfMissing = false)
-	public IFileService getLocalFileService(FileStorageProperties fileStorageProperties) throws Exception {
-		return new LocalFileService(fileStorageProperties);
+	public FilesStorageService getLocalFileService(FileStorageProperties fileStorageProperties) throws Exception {
+		return new LocalFileService();
 	}
 
 }

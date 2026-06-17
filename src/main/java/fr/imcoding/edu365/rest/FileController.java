@@ -1,21 +1,39 @@
 package fr.imcoding.edu365.rest;
 
+import fr.imcoding.edu365.business.services.AnnouncementService;
+import fr.imcoding.edu365.business.services.MediaService;
+import fr.imcoding.edu365.business.services.ProjectService;
+import fr.imcoding.edu365.business.services.UserService;
+import fr.imcoding.edu365.business.services.files.DBFileStorageService;
+import fr.imcoding.edu365.business.services.files.FilesStorageService;
+import fr.imcoding.edu365.enumeration.MediaContext;
+import fr.imcoding.edu365.persistence.entities.Announcement;
+import fr.imcoding.edu365.persistence.entities.Media;
+import fr.imcoding.edu365.persistence.entities.Project;
+import fr.imcoding.edu365.persistence.entities.User;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
 import javax.servlet.http.HttpServletRequest;
-
+import javax.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,24 +44,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import fr.imcoding.edu365.business.services.AnnouncementService;
-import fr.imcoding.edu365.business.services.MediaService;
-import fr.imcoding.edu365.business.services.ProjectService;
-import fr.imcoding.edu365.business.services.UserService;
-import fr.imcoding.edu365.business.services.files.IFileService;
-import fr.imcoding.edu365.enumeration.MediaContext;
-import fr.imcoding.edu365.persistence.entities.Announcement;
-import fr.imcoding.edu365.persistence.entities.Media;
-import fr.imcoding.edu365.persistence.entities.Project;
-import fr.imcoding.edu365.persistence.entities.User;
-import lombok.RequiredArgsConstructor;
-
 @RequestMapping("/file")
 @RestController
 @RequiredArgsConstructor
+@CrossOrigin
 public class FileController {
 
-  private final IFileService dBFileStorageService;
+  private final FilesStorageService dBFileStorageService;
 
   private final AnnouncementService announcementService;
 
@@ -114,17 +121,12 @@ public class FileController {
 
   @CrossOrigin
   @GetMapping("/downloadFile/{fileName:.+}")
-  public ResponseEntity<Resource> downloadFile(@PathVariable String fileName,
+  public ResponseEntity<byte[]> downloadFile(@PathVariable String fileName,
       HttpServletRequest request)
       throws Exception {
-    Resource resource = dBFileStorageService.loadFileAsResource(fileName);
-
-    String contentType = null;
-    try {
-      contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
-    } catch (IOException ex) {
-
-    }
+    byte[] bytes = dBFileStorageService.load(fileName);
+      Media media = mediaService.findByMediaLabel(fileName);
+    String contentType = media.getMediaContentType();
 
     // Fallback to the default content type if type could not be determined
     if (contentType == null) {
@@ -133,8 +135,8 @@ public class FileController {
 
     return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
         .header(HttpHeaders.CONTENT_DISPOSITION,
-            "attachment; filename=\"" + resource.getFilename() + "\"")
-        .body(resource);
+            "attachment; filename=\"" + media.getMediaLabel()+ "\"")
+        .body(bytes);
   }
 
   @CrossOrigin
@@ -156,16 +158,14 @@ public class FileController {
     userService.saveOrUpdateUser(user);
   }
 
-  @CrossOrigin
   @RequestMapping(path = "/download-file", method = RequestMethod.GET)
-  public ResponseEntity<Resource> download(@RequestParam("filename") String filepath) throws Exception {
-    //Path path =dBFileStorageService.getAbsolutePath(filepath);
-    //ByteArrayResource resource = new ByteArrayResource(Files.readAllBytes(path));
-    Resource resource = dBFileStorageService.loadFileAsResource(filepath);
+  public ResponseEntity<byte[]> download(@RequestParam("filename") String fileName) throws IOException {
+    byte[] bytes =dBFileStorageService.load(fileName);
+    ByteArrayResource resource = new ByteArrayResource(bytes);
 
     return ResponseEntity.ok()
         .contentType(MediaType.APPLICATION_OCTET_STREAM)
-        .body(resource);
+        .body(bytes);
   }
 
 

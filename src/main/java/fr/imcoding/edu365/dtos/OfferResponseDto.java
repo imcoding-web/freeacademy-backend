@@ -34,7 +34,7 @@ public class OfferResponseDto {
 	private Date videoconferenceDate;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", lenient = OptBoolean.FALSE)
 	private Date correctionDeliveryDate;
-	private ExpertDetailsForOffer offerExpert;
+	private CourseCreatorDto offerExpert;
 	private User_Details offerClient;
 	private OfferStatus offerStatus;
 	private String wordForExpert;

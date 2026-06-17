@@ -2,6 +2,7 @@ package fr.imcoding.edu365.business.mappers;
 
 import fr.imcoding.edu365.business.services.PrestationMeetingService;
 import fr.imcoding.edu365.client.dtos.response.OfferResponse;
+import fr.imcoding.edu365.dtos.CourseCreatorDto;
 import fr.imcoding.edu365.dtos.OfferResponseDto;
 import fr.imcoding.edu365.dtos.SkillAreaDto;
 import fr.imcoding.edu365.persistence.entities.Offer;
@@ -50,7 +51,12 @@ public class OfferMapper {
         offer.getUuid()).videoconferenceDate(
         (offer.getVideoconferenceStartDate()!=null&& offer.getVideoconferenceStartTime()!=null)?DatesUtils.setDateTime(offer.getVideoconferenceStartDate(),offer.getVideoconferenceStartTime()):null).
         correctionDeliveryDate(offer.getDeadlineDeliveringCorrection()!=null?offer.getDeadlineDeliveringCorrection():null).
-        offerExpert(expertMapper.toExpertDetailsForOffer(offer.getOfferGiver())).
+        offerExpert(offer.getOfferGiver()!=null?CourseCreatorDto.builder()
+                .userDetails(userMapper.toTeacherDetails(offer.getOfferGiver()))
+                .skill(offer.getOfferGiver()!= null ?
+                        skillMapper.toSkillDto(offer.getOfferGiver().getSkills().stream().findFirst().orElse(null))
+                        : null)
+                .build():null).
         offerClient(userMapper.toUserDetails(offer.getAnnouncement().getAnnouncementPublisher())).
         offerStatus(offer.getOfferStatus()).
         wordForExpert(offer.getWordForExpert()).
@@ -74,7 +80,19 @@ public class OfferMapper {
   }
 
   public OfferResponseDto toOfferPrestationResponseDto(OfferResponseDto offerResponseDto){
-    return OfferResponseDto.builder().offerExpert(offerResponseDto.getOfferExpert()).correctionDeliveryDate(offerResponseDto.getCorrectionDeliveryDate()).videoconferenceDate(offerResponseDto.getVideoconferenceDate()).announcementUuid(offerResponseDto.getAnnouncementUuid()).videoconferenceDuration(offerResponseDto.getVideoconferenceDuration()).build();
+    return OfferResponseDto
+            .builder()
+            .offerExpert(offerResponseDto.getOfferExpert())
+            .correctionDeliveryDate(offerResponseDto.getCorrectionDeliveryDate())
+            .videoconferenceDate(offerResponseDto.getVideoconferenceDate())
+            .announcementUuid(offerResponseDto.getAnnouncementUuid())
+            .announcementTitle(offerResponseDto.getAnnouncementTitle())
+            .announcementSkill(offerResponseDto.getAnnouncementSkill())
+        .announcementType(offerResponseDto.getAnnouncementType())
+            .announcementSkillLevel(offerResponseDto.getAnnouncementSkillLevel())
+            .inStudyPackage(offerResponseDto.isInStudyPackage())
+        .wordForExpert(offerResponseDto.getWordForExpert())
+            .videoconferenceDuration(offerResponseDto.getVideoconferenceDuration()).build();
 
   }
   public OfferResponseDto toOfferPaymentResponseDto(OfferResponseDto offerResponseDto){
@@ -83,14 +101,20 @@ public class OfferMapper {
   }
 
   public OfferResponseDto toPrestationDetailsOfferResponseDto(Offer offer){
-    return  OfferResponseDto.builder().offerUuid(
+    OfferResponseDto dto =   OfferResponseDto.builder().offerUuid(
         offer.getUuid()).videoconferenceDate(
         (offer.getVideoconferenceStartDate()!=null&& offer.getVideoconferenceStartTime()!=null)?DatesUtils.setDateTime(offer.getVideoconferenceStartDate(),offer.getVideoconferenceStartTime()):null).
         correctionDeliveryDate(offer.getDeadlineDeliveringCorrection()!=null?offer.getDeadlineDeliveringCorrection():null).
-        offerExpert(expertMapper.toExpertDetailsForOffer(offer.getOfferGiver())).
-        offerClient(userMapper.toUserDetails(offer.getAnnouncement().getAnnouncementPublisher())).
+            offerExpert(offer.getOfferGiver() != null ? CourseCreatorDto.builder()
+                    .userDetails(userMapper.toTeacherDetails(offer.getOfferGiver()))
+                    .skill(offer.getOfferGiver() != null ?
+                            skillMapper.toSkillDto(offer.getOfferGiver().getSkills().stream().findFirst().orElse(null))
+                            : null)
+                    .build() : null).
+            offerClient(userMapper.toUserDetails(offer.getAnnouncement().getAnnouncementPublisher())).
         offerStatus(offer.getOfferStatus()).
-        wordForExpert(offer.getWordForExpert()).
+        //wordForExpert(offer.getWordForExpert()).
+        wordForExpert(offer.getAnnouncement().getAnnouncementDescription()).
         offerPrice(offer.getOfferPrice()).
         announcementUuid(offer.getAnnouncement().getUuid()).
         announcementInterventionType(offer.getAnnouncement().getInterventionType()).
@@ -101,6 +125,9 @@ public class OfferMapper {
         announcementSkill(skillMapper.toSkillDto(offer.getAnnouncement().getSkill())).
         videoconferenceDuration(offer.getVideoconferenceDuration()).
         announcementMedias((offer.getAnnouncement().getMedias()!=null)?offer.getAnnouncement().getMedias().stream().map(mediaDatailsMapper::toMediaDetails).collect(Collectors.toList()):null).
+        inStudyPackage(offer.getAnnouncement().getAnnouncementPublisher() == null).
         build();
+
+    return dto;
   }
 }

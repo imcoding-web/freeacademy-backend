@@ -17,8 +17,10 @@ import lombok.NoArgsConstructor;
 @Builder
 public class TeacherCourseSearchCriteria {
   private String skillArea;
+  private String skillAreaSection;
   private String skill;
   private CourseType type;
   private Quarter quarter;
+  private Boolean shouldBeDisplayed;
 
 }

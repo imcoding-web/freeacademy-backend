@@ -58,9 +58,7 @@ public class InformationGiver extends User {
   @Column(columnDefinition = "TEXT")
   @Type(type = "text")
   private String userDescription;
-  @Column(columnDefinition="bit default 0")
   private boolean isValidate;
-  @Column(columnDefinition="bit default 0")
   private boolean exemptFromFees;
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Africa/Tunis")
   @Temporal(TemporalType.DATE)
@@ -69,7 +67,6 @@ public class InformationGiver extends User {
   //@JsonProperty
   private boolean isTermsAccepted;
 
-  @Column(columnDefinition="bit default 0")
   private boolean homeServices;
   @Column(columnDefinition = "TEXT")
   @Type(type = "text")
@@ -95,7 +92,6 @@ public class InformationGiver extends User {
 	@ManyToOne
 	private Skill supportCourseCourse;
 
-  @Column(columnDefinition="bit default 0")
   private boolean isElligibleToDoCourses;
 
 

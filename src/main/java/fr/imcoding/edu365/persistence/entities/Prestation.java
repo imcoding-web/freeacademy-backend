@@ -2,6 +2,8 @@ package fr.imcoding.edu365.persistence.entities;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import fr.imcoding.edu365.enumeration.PrestationStatus;
+
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -13,6 +15,9 @@ import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+
+import fr.imcoding.edu365.utils.Constants;
+import javax.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -35,9 +40,16 @@ public class Prestation extends BaseEntity{
   private Offer offer;
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
   private Date markAsSolvedDate;
-  @OneToMany(cascade = {CascadeType.MERGE,CascadeType.REMOVE}, fetch = FetchType.EAGER)
+  @OneToMany(cascade = {CascadeType.MERGE,CascadeType.REMOVE}, fetch = FetchType.LAZY)
   private List<Media> medias=new ArrayList<>();
   private String refusalReason;
+
+  //La date de la prestation
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = Constants.DEFAULT_TIMEZONE)
+  private LocalDateTime date;
+
+  @Transient
+  private boolean live = false;
 
 
 

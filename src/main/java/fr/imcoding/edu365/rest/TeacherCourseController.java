@@ -10,11 +10,15 @@ import fr.imcoding.edu365.dtos.TeacherCourseResponse;
 import fr.imcoding.edu365.enumeration.CourseType;
 import fr.imcoding.edu365.enumeration.Quarter;
 import fr.imcoding.edu365.persistence.entities.TeacherCourse;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.repository.config.ResourceReaderRepositoryPopulatorBeanDefinitionParser;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -69,6 +73,10 @@ public class TeacherCourseController {
   public TeacherCourse updateTeacherCourse(@ModelAttribute TeacherCourseRequest teacherCourseRequest) {
     return this.teacherCourseService.updateTeacherCourse(teacherCourseRequest);
   }
+  @PatchMapping(value="/update-visibility/{courseUuid}")
+  public void updateCourseVisibility(@PathVariable("courseUuid") UUID courseId, @RequestParam("shouldBeDisplayed") Boolean shouldBeDisplayed) {
+     this.teacherCourseService.updateCourseVisibility(courseId, shouldBeDisplayed);
+  }
 
   @GetMapping("/last-six-course")
   public List<TeacherCourseDetails> getLast6Course(){
@@ -88,6 +96,23 @@ public class TeacherCourseController {
 
     return teacherCourseService.filterCourses(
         page, offset,skill,type,quarter);
+  }
+
+  @GetMapping(value = "/filtred-for-admin")
+  public PageDto<TeacherCourseResponse> filterCoursesForAdmin(
+      @RequestParam(name = "skillAreaCode", required = false)
+      String skillAreaCode,
+      @RequestParam(name = "sectionCode", required = false)
+      String sectionCode,
+      @RequestParam(name = "skillLabel", required = false)
+      String skillLabel,
+      @RequestParam(name = "quarter", required = false)
+      Quarter quarter,
+      @RequestParam(name = "type", required = false)
+      CourseType type) {
+
+    return teacherCourseService.filterCoursesForAdmin(
+        skillAreaCode,sectionCode, skillLabel,quarter, type);
   }
 
 

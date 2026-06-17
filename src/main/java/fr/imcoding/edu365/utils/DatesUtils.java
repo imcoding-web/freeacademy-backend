@@ -214,15 +214,7 @@ public class DatesUtils {
     return hours*60;
   }
   private DatesUtils() {}
-  public static Date calculateEndDate(Date startDate,int monthsNumber) {
-    LocalDate localStartDate = startDate.toInstant()
-        .atZone(ZoneId.systemDefault())
-        .toLocalDate()
-        .plusMonths(monthsNumber);
-
-    Instant instant = localStartDate.atStartOfDay(ZoneId.systemDefault()).toInstant();
-    Date endDate = Date.from(instant);
-
-    return endDate;
+  public static LocalDate calculateEndDate(LocalDate startDate,int monthsNumber) {
+    return startDate.plusMonths(monthsNumber);
   }
 }

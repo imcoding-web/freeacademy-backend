@@ -1,34 +1,18 @@
 package fr.imcoding.edu365.business.services.files;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.*;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.amazonaws.AmazonClientException;
-import com.amazonaws.AmazonServiceException;
-import com.amazonaws.SdkClientException;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.DeleteObjectRequest;
-import com.amazonaws.services.s3.model.GetObjectRequest;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.amazonaws.services.s3.model.S3Object;
+import java.io.IOException;
 
-import fr.imcoding.edu365.persistence.entities.Media;
-
-public class RemoteFileService implements IFileService {
+public class RemoteFileService implements FilesStorageService {
 	private static final Logger logger = LoggerFactory.getLogger(RemoteFileService.class);
 
 	@Autowired
@@ -37,8 +21,55 @@ public class RemoteFileService implements IFileService {
 	@Value("${storage.spaces.bucket}")
 	private String spaceBucket;
 
+
+
 	@Override
-	public String storeFile(MultipartFile file) throws IOException {
+    public void save(MultipartFile file, String fileStorageName, String path) {
+        // Créer les métadonnées de l'objet
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentLength(file.getSize());
+        metadata.setContentType(file.getContentType());
+
+        // Construire le chemin complet de l'objet dans S3
+        String fullPath = path + "/" + fileStorageName;
+
+        // Créer la requête pour mettre l'objet dans S3
+        try {
+            PutObjectRequest putObjectRequest = new PutObjectRequest(spaceBucket, fullPath, file.getInputStream(), metadata);
+                  //  .withCannedAcl(CannedAccessControlList.PublicRead);
+            // Envoyer le fichier à S3
+            s3Client.putObject(putObjectRequest);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+	@Override
+	public byte[] load(String filePath) {
+
+		// Récupérer l'objet de S3
+		S3Object s3Object = s3Client.getObject(spaceBucket, filePath);
+
+
+		try (S3ObjectInputStream inputStream = s3Object.getObjectContent()) {
+			// Convertir le flux en byte[]
+			return IOUtils.toByteArray(inputStream);
+		} catch (IOException e) {
+			throw new RuntimeException("Error reading file content: " + e.getMessage());
+        }
+    }
+
+	@Override
+	public void deleteFile(String filePath) {
+		DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest(spaceBucket, filePath);
+		// Supprimer l'objet
+		s3Client.deleteObject(deleteObjectRequest);
+
+	}
+
+	@Override
+	public String storeFile(MultipartFile file) {
+		// Normalize file name
 		String[] splitName = file.getOriginalFilename().split("\\.");
 		String extension = null;
 		if (splitName.length != 0) {
@@ -49,69 +80,24 @@ public class RemoteFileService implements IFileService {
 		}
 		String fileName = RandomStringUtils.random(10, true, true) + "." + extension;
 
-		saveFileToServer(file.getInputStream(), fileName, file.getContentType());
-		return fileName;
-
-	}
-
-	@Override
-	public String storePdfFile(String resourceName, byte[] pdfFile) throws Exception {
-		String fileName = resourceName + ".pdf";
 		try {
-			saveFileToServer(new ByteArrayInputStream(pdfFile), fileName, "application/pdf");
+
+			// Create the metadata for the object
+			ObjectMetadata metadata = new ObjectMetadata();
+			metadata.setContentLength(file.getSize());
+			metadata.setContentType(file.getContentType());
+
+			// Create the request to put the object in S3
+			PutObjectRequest putObjectRequest = new PutObjectRequest(spaceBucket, fileName, file.getInputStream(), metadata);
+
+			// Upload the file to S3
+			s3Client.putObject(putObjectRequest);
 
 			return fileName;
-		} catch (Exception ex) {
-			throw new Exception("Could not store file " + fileName + ". Please try again!", ex);
+		} catch (IOException e) {
+			throw new RuntimeException("Could not store the file. Error: " + e.getMessage());
+		} catch (Exception e) {
+			throw new RuntimeException("Could not store the file. Error: " + e.getMessage());
 		}
-
-	}
-
-	private void saveFileToServer(InputStream file, String key, String contentType) throws IOException {
-		ObjectMetadata metadata = new ObjectMetadata();
-		metadata.setContentLength(file.available());
-		if (contentType != null && !"".equals(contentType)) {
-			metadata.setContentType(contentType);
-		}
-		s3Client.putObject(new PutObjectRequest(spaceBucket, key, file, metadata)
-				.withCannedAcl(CannedAccessControlList.PublicRead));
-	}
-
-	@Override
-	public Resource loadFileAsResource(String fileName) throws Exception {
-		try {
-			S3Object s3object = s3Client.getObject(new GetObjectRequest(spaceBucket, fileName));
-			Resource resource = new InputStreamResource(s3object.getObjectContent());
-			if (resource.exists()) {
-				return resource;
-			} else {
-				throw new Exception("File not found " + fileName);
-			}
-		} catch (MalformedURLException ex) {
-			throw new Exception("File not found " + fileName, ex);
-		}
-	}
-
-	@Override
-	@Async
-	public void deleteFile(Media media) {
-		try {
-			s3Client.deleteObject(new DeleteObjectRequest(spaceBucket, media.getMediaLabel()));
-
-		} catch (AmazonServiceException serviceException) {
-			logger.error("AmazonServiceException Message:    " + serviceException.getMessage());
-		} catch (AmazonClientException clientException) {
-			logger.error("AmazonClientException Message: " + clientException.getMessage());
-		}
-	}
-
-	@Override
-	public Long getFileSize(String fileName) {
-		return s3Client.getObjectMetadata(spaceBucket, fileName).getContentLength();
-	}
-
-	@Override
-	public byte[] readByteRangeNew(String fileName, long start, long end) throws Exception {
-		return s3Client.getObject(spaceBucket, fileName).getObjectContent().readAllBytes();
 	}
 }

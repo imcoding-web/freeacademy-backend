@@ -29,8 +29,8 @@ public class SkillAreaService {
   private final SkillAreaMapper skillAreaMapper;
 
   public List<SkillAreaDto> getAllSkillArea() {
-    return this.skillAreaRepository.findAll().stream()
-        .map(skillArea -> skillAreaMapper.toSkillAreaDto(skillArea)).collect(Collectors
+    return this.skillAreaRepository.findAllByShouldBeDisplayedTrue().stream()
+        .map(skillAreaMapper::toSkillAreaDto).collect(Collectors
             .toList());
 
   }

@@ -22,6 +22,8 @@ public class InformationSeeker extends User {
    */
   @ManyToOne
   private SkillArea currentLevel;
+  @ManyToOne
+  private SkillAreaSection currentLevelSection;
   private static final long serialVersionUID = 8989179485955903584L;
   
   @PrePersist

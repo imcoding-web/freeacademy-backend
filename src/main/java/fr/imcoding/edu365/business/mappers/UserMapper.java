@@ -9,7 +9,10 @@ import fr.imcoding.edu365.dtos.UserDetails;
 import fr.imcoding.edu365.dtos.UserDto;
 import fr.imcoding.edu365.persistence.entities.InformationGiver;
 import fr.imcoding.edu365.persistence.entities.InformationSeeker;
+import fr.imcoding.edu365.persistence.entities.PackageSubscription;
+import fr.imcoding.edu365.persistence.entities.SkillSubscription;
 import fr.imcoding.edu365.persistence.entities.User;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -27,8 +30,15 @@ public class UserMapper {
     return new UserDto(user.getUserFirstName(), user.getUserLastName(), user.getCreatedAt());
   }
   public User_Details toUserDetails(User user) {
+      if(user == null) return null;
     return User_Details.builder().userUuid(user.getUuid()).userFirstName(user.getUserFirstName()).userLastName(user.getUserLastName()).userProfilePicture(userUtils.getPictureProfile(user)).build();
   }
+
+    public User_Details toTeacherDetails(InformationGiver user) {
+        if(user == null) return null;
+        return User_Details.builder().userUuid(user.getUuid()).userFirstName(user.getUserFirstName()).userLastName(user.getUserLastName()).userProfilePicture(userUtils.getPictureProfile(user)).currentSchool(user.getCurrentSchool())
+                .userDescription(user.getUserDescription()).build();
+    }
 
   public UserDetails toUserDetailsResponse(User user) {
     return new UserDetails(user.getUuid(), user.getUserFirstName(), user.getUserLastName(),
@@ -49,11 +59,40 @@ public class UserMapper {
 	}
 
   public UserResponse toUserResponse(User user) {
+      if(user == null) return null;
     return new UserResponse(user.getUuid(), user.getUserFirstName(), user.getUserLastName(),
         user.getCreatedAt(),
         user.getUserEmail(), user.getUserBirthDate(),
         user.getUserAddress() != null ? addressMapper.toAddressDto(user.getUserAddress()) : null,
-        userUtils.getPictureProfile(user)
+        userUtils.getPictureProfile(user), null, null
+
+    );
+  }
+    public UserResponse toUserResponse(User user, PackageSubscription packageSubscription) {
+        if(user == null) return null;
+        return new UserResponse(user.getUuid(), user.getUserFirstName(), user.getUserLastName(),
+                user.getCreatedAt(),
+                user.getUserEmail(), user.getUserBirthDate(),
+                user.getUserAddress() != null ? addressMapper.toAddressDto(user.getUserAddress()) : null,
+                userUtils.getPictureProfile(user),
+                packageSubscription != null,
+            packageSubscription != null? packageSubscription.getSkillAreaPackage().getPackageType() : null
+
+
+
+        );
+    }
+
+  public UserResponse toUserResponse(User user, List<SkillSubscription> skillSubscriptions) {
+    if(user == null) return null;
+    return new UserResponse(user.getUuid(), user.getUserFirstName(), user.getUserLastName(),
+        user.getCreatedAt(),
+        user.getUserEmail(), user.getUserBirthDate(),
+        user.getUserAddress() != null ? addressMapper.toAddressDto(user.getUserAddress()) : null,
+        userUtils.getPictureProfile(user),
+        !skillSubscriptions.isEmpty(),
+        !skillSubscriptions.isEmpty()? skillSubscriptions.get(0).getPackageType() : null
+
 
 
     );

@@ -4,22 +4,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.*;
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
-import org.hibernate.annotations.Type;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.*;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -89,6 +80,11 @@ public class Announcement extends BaseEntity {
   @ManyToOne
   private SkillArea announcementSkillArea;
 
+  @ManyToMany
+  @JsonIgnore
+  @LazyCollection(LazyCollectionOption.FALSE)
+  private List<SkillAreaSection> skillAreaSections;
+
   @ManyToOne
   private Skill skill;
 
@@ -98,14 +94,12 @@ public class Announcement extends BaseEntity {
   private int hoursNumber;
   private String refusalReason;
   
-  @Column(columnDefinition="bit default 0")
   private boolean homeService;
   
   @Column(columnDefinition = "TEXT")
   @Type(type = "text")
   private String homeServiceDetails;
   
-  @Column(columnDefinition="bit default 0")
   private boolean inStudyPackage;
   
   private int estimatedPriceToPay;

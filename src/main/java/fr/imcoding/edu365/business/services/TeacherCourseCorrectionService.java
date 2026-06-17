@@ -2,6 +2,8 @@ package fr.imcoding.edu365.business.services;
 
 import java.util.UUID;
 
+import fr.imcoding.edu365.enumeration.RoleCode;
+import fr.imcoding.edu365.persistence.entities.TeacherCourse;
 import org.springframework.stereotype.Service;
 
 import fr.imcoding.edu365.business.mappers.TeacherCourceCorrectionMapper;
@@ -37,15 +39,28 @@ public class TeacherCourseCorrectionService {
   }
 
 	public TeacherCourseResponse getLessonCorrectionDetail(UUID lessonUuid) {
-		LessonCorrection lessonCorrection = lessonCorrectionService.getLessonCorrectionByUuid(lessonUuid);
-		if (lessonCorrection == null)
-			return null;
-		InformationSeeker student = (InformationSeeker) userService.getCurrentUser();
-		boolean hasSubscription = subscriptionRepository.existsByStudentAndSubscriptionStatus(student,
-				PackageStatus.ACTIVE);
-		if (!hasSubscription)
-			return null;
-		return teacherCourseMapper.toTeacherCourseResponseWithDetailedCorrection(lessonCorrection.getCourse(),
-				lessonCorrection);
+
+		if(userService.getCurrentUser().getUserRole().getRoleCode() == RoleCode.INFORMATION_SEEKER) {
+			//pour l'etudiant on passe l'uuid de la correction et pas du cours
+			LessonCorrection lessonCorrection = lessonCorrectionService.getLessonCorrectionByUuid(lessonUuid);
+
+			InformationSeeker student = (InformationSeeker) userService.getCurrentUser();
+			boolean hasSubscription = subscriptionRepository.existsByStudentAndSubscriptionStatus(student,
+					PackageStatus.ACTIVE);
+			if (!hasSubscription && lessonCorrection.isOnlySubscribedUsers())
+				return null;
+			return teacherCourseMapper.toTeacherCourseResponseWithDetailedCorrection(lessonCorrection.getCourse(),
+					lessonCorrection);
+		} else {
+			TeacherCourse course = teacherCourseService.getByUuid(lessonUuid);
+			LessonCorrection lessonCorrection = lessonCorrectionService.getLessonCorrection(lessonUuid);
+			/*if (lessonCorrection == null)
+				return null;*/
+			return teacherCourseMapper.toTeacherCourseResponseWithDetailedCorrection(course,
+					lessonCorrection);
+
+		}
+
+
 	}
 }

@@ -32,8 +32,10 @@ public class TeacherCourseResponse {
   private Quarter quarter;
   private List<MediaDetails> medias = new ArrayList<>();
   private SkillAreaDto skillArea;
+  private SkillAreaSectionDto skillAreaSection;
   private SkillDto skill;
   private Boolean isPremium;
+  private Boolean shouldBeDisplayed;
   private LessonCorrectionResponse lessonCorrection;
   //ajouter pour afficger les detailsd e la correction
   private CourseCreatorDto courseCreator;

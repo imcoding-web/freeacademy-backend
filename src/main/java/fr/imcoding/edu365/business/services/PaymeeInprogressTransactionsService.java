@@ -3,12 +3,7 @@ package fr.imcoding.edu365.business.services;
 import fr.imcoding.edu365.enumeration.PaymentStatus;
 import fr.imcoding.edu365.enumeration.PaymentType;
 import fr.imcoding.edu365.enumeration.TransactionType;
-import fr.imcoding.edu365.persistence.entities.InformationGiver;
-import fr.imcoding.edu365.persistence.entities.Offer;
-import fr.imcoding.edu365.persistence.entities.PaymeeInProgressTransaction;
-import fr.imcoding.edu365.persistence.entities.SobflousInprogressTransaction;
-import fr.imcoding.edu365.persistence.entities.User;
-import fr.imcoding.edu365.persistence.entities.UserFees;
+import fr.imcoding.edu365.persistence.entities.*;
 import fr.imcoding.edu365.persistence.repositories.PaymeeInprogressTransactionsRepository;
 import fr.imcoding.edu365.persistence.repositories.SobflousInprogressTransactionsRepository;
 import fr.imcoding.edu365.utils.Utils;
@@ -26,11 +21,14 @@ public class PaymeeInprogressTransactionsService {
   private final UserService userService;
   private final PaymeeInprogressTransactionsRepository paymeeInprogressTransactionsRepository;
 
-  public PaymeeInProgressTransaction savePaymeeTransaction(Offer offer,String token) {
+  public PaymeeInProgressTransaction savePaymeeTransaction(Offer offer, SkillAreaPackage pack, String token) {
     PaymeeInProgressTransaction inprogressTransactions=new PaymeeInProgressTransaction();
       inprogressTransactions.setOffer(offer);
+      inprogressTransactions.setPack(pack);
     inprogressTransactions.setToken(token);
-    inprogressTransactions.setTransactionType(TransactionType.OFFER);
+    inprogressTransactions.setTransactionType(offer != null ? TransactionType.OFFER: TransactionType.PACKAGE);
+    User user =  userService.getCurrentUser();
+    inprogressTransactions.setUser(user);
     return paymeeInprogressTransactionsRepository.save(inprogressTransactions);
   }
 

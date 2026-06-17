@@ -1,16 +1,15 @@
 package fr.imcoding.edu365.business.services;
 
-import java.util.List;
-import java.util.UUID;
-
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
-import fr.imcoding.edu365.business.services.files.IFileService;
+import fr.imcoding.edu365.business.services.files.DBFileStorageService;
+import fr.imcoding.edu365.business.services.files.FilesStorageService;
 import fr.imcoding.edu365.enumeration.MediaContext;
 import fr.imcoding.edu365.persistence.entities.Media;
 import fr.imcoding.edu365.persistence.repositories.MediaRepository;
+import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -18,7 +17,7 @@ public class MediaService {
 
   private final MediaRepository mediaRepository;
 
-  private final IFileService dBFileStorageService;
+  private final FilesStorageService dBFileStorageService;
 
   public List<Media> getAllMedias() {
     return this.mediaRepository.findAll();
@@ -50,5 +49,13 @@ public class MediaService {
     media.setOriginalName(file.getOriginalFilename());
     media = mediaRepository.save(media);
     return media;
+  }
+
+  public Media findByMediaLabel(String mediaLabel) {
+      List<Media> medias = this.mediaRepository.findByMediaLabel(mediaLabel);
+      if(medias != null && !medias.isEmpty()) {
+          return medias.get(0);
+      }
+    return null;
   }
 }

@@ -3,6 +3,7 @@ package fr.imcoding.edu365.client.dtos.request;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.imcoding.edu365.dtos.AddressDto;
 import fr.imcoding.edu365.dtos.SkillAreaDto;
+import fr.imcoding.edu365.dtos.SkillAreaSectionDto;
 import fr.imcoding.edu365.dtos.SpecialityDto;
 import fr.imcoding.edu365.enumeration.RoleCode;
 import lombok.AllArgsConstructor;
@@ -28,4 +29,6 @@ public class UserRequest {
   private boolean isTermsAccepted;
 
   private SkillAreaDto skillLevel;
+  private SkillAreaSectionDto skillLevelSection;
+
 }

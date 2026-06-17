@@ -1,6 +1,8 @@
 package fr.imcoding.edu365.persistence.repositories;
 
 import fr.imcoding.edu365.persistence.entities.SkillArea;
+
+import java.util.List;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,5 +17,6 @@ public interface SkillAreaRepository extends JpaRepository<SkillArea, Long> {
   SkillArea findBySkillAreaCode(String skillAreaCode);
 
   Page<SkillArea>  findBySkillAreaLabelStartingWith(String skillAreaLabel, Pageable pageable);
+  List<SkillArea> findAllByShouldBeDisplayedTrue();
 
 }

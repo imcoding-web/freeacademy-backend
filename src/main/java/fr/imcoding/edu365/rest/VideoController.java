@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 /**
  * @author Rokaya
@@ -25,8 +26,8 @@ public class VideoController {
 
   @GetMapping("/stream/{mediaUuid}")
   @CrossOrigin
-  public ResponseEntity<byte[]> streamVideo(@RequestHeader(value = "Range", required = false) String httpRangeList,
-      @PathVariable("mediaUuid") UUID mediaUuid) throws Exception {
+  public ResponseEntity<StreamingResponseBody> streamVideo(@RequestHeader(value = "Range", required = false) String httpRangeList,
+                                                           @PathVariable("mediaUuid") UUID mediaUuid) {
     return videoService.prepareContent(mediaUuid, httpRangeList);
   }
 

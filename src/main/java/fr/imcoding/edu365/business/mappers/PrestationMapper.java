@@ -28,12 +28,16 @@ public class PrestationMapper {
 
   public PrestationResponse toPrestationResponse(Prestation prestation){
     PrestationMeeting prestationMeeting=prestationMeetingService.getPrestationMeetingByPrestationUuid(prestation.getUuid());
-    return PrestationResponse.builder()
+    PrestationResponse response =  PrestationResponse.builder()
         .prestationUuid(prestation.getUuid())
+            .date(prestation.getDate())
+        .live(prestation.isLive())
         .prestationStatus(prestation.getPrestationStatus())
         .offer(offerMapper.toOfferPrestationResponseDto(offerMapper.toPrestationDetailsOfferResponseDto(prestation.getOffer()))).markAsSolvedDate(prestation.getMarkAsSolvedDate())
         .medias(!prestation.getMedias().isEmpty()? prestation.getMedias().stream().map(media->mediaMapper.toMediaDetails(media)).collect(
             Collectors.toList()):null).prestationMeeting(prestationMeetingMapper.toPrestationMeetingResponse(prestationMeeting)).build();
+
+    return response;
 
   }
   public PrestationResponse toPrestationDetailsResponse(Prestation prestation){

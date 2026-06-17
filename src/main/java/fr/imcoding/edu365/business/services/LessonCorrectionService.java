@@ -5,11 +5,12 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import fr.imcoding.edu365.business.services.files.FilesStorageService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import fr.imcoding.edu365.business.mappers.LessonCorrectionMapper;
-import fr.imcoding.edu365.business.services.files.IFileService;
+import fr.imcoding.edu365.business.services.files.DBFileStorageService;
 import fr.imcoding.edu365.dtos.LessonCorrectionRequest;
 import fr.imcoding.edu365.dtos.LessonCorrectionResponse;
 import fr.imcoding.edu365.dtos.MediaDto;
@@ -32,7 +33,7 @@ public class LessonCorrectionService {
   private final LessonCorrectionMapper lessonCorrectionMapper;
   private final MediaService mediaService;
   private final TeacherCourseRepository teacherCourseRepository;
-  private final IFileService dBFileStorageService;
+  private final FilesStorageService dBFileStorageService;
   //private final TeacherCourceCorrectionMapper teacherCourceCorrectionMapper;
 
   public LessonCorrection saveLessonCorrection(LessonCorrectionRequest lessonCorrectionRequest) {
@@ -82,7 +83,7 @@ public class LessonCorrectionService {
     if (!mediaListToDelete.isEmpty()) {
       mediaListToDelete.forEach(media -> {
         mediaService.deleteMedia(media.getId());
-        dBFileStorageService.deleteFile(media);
+        dBFileStorageService.deleteFile(media.getMediaLabel());
       });
 
       lessonCorrection.getMedias().removeAll(mediaListToDelete);

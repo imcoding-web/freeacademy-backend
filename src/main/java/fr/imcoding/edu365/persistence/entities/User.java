@@ -9,6 +9,8 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
@@ -27,6 +29,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "edu365_user")
+@Inheritance(strategy = InheritanceType.JOINED)
 @Data
 @NoArgsConstructor
 public class User extends BaseEntity {
@@ -60,7 +63,7 @@ public class User extends BaseEntity {
   @Enumerated(EnumType.STRING)
   private ProviderType provider;
 
-  @OneToMany(fetch = FetchType.EAGER)
+  @OneToMany(fetch = FetchType.LAZY)
   private List<Media> medias = new ArrayList<>();
 
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Africa/Tunis")
@@ -70,6 +73,8 @@ public class User extends BaseEntity {
   @Temporal(TemporalType.DATE)
   private Date lastDeactivationDate;
   private boolean isFirstConnexion;
+
+  private boolean isEmailverified;
 
   @PrePersist
   public void prePersist() {
@@ -82,5 +87,9 @@ public class User extends BaseEntity {
   
   public boolean isUserIsActif() {
 	  return this.accountStatus == AccountStatus.ACTIVE;
+  }
+
+  public String getFullName() {
+    return this.userFirstName + " " + this.userLastName;
   }
 }

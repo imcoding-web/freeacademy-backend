@@ -1,47 +1,87 @@
 package fr.imcoding.edu365.business.services.files;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.Optional;
-
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Service;
+import org.springframework.util.FileSystemUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import fr.imcoding.edu365.business.services.MediaService;
-import fr.imcoding.edu365.config.FileStorageProperties;
-import fr.imcoding.edu365.persistence.entities.Media;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.stream.Stream;
 
-public class LocalFileService implements IFileService {
+public class LocalFileService implements FilesStorageService {
 	private static final Logger log = LoggerFactory.getLogger(LocalFileService.class);
 
-	private final Path fileStorageLocation;
-
-	@Autowired
-	public LocalFileService(FileStorageProperties fileStorageProperties) throws Exception {
-		this.fileStorageLocation = Paths.get(fileStorageProperties.getUploadDir()).toAbsolutePath().normalize();
-
+	@Value("${file.upload-dir}")
+	private String UPLOAD_DIR;
+	private static final Logger LOG = LoggerFactory.getLogger(LocalFileService.class);
+	@Override
+	public void save(MultipartFile file, String fileStorageName, String path) {
 		try {
-			Files.createDirectories(this.fileStorageLocation);
-		} catch (IOException ex) {
-			throw new Exception("Could not create the directory where the uploaded files will be stored.", ex);
+			Path uploadDest =  this.getFileUploadRoot(path).resolve(fileStorageName);
+			if (uploadDest.toFile().exists()) {
+				File destFile = uploadDest.resolve(String.valueOf(System.currentTimeMillis())).toFile();
+				destFile.getParentFile().mkdirs();
+				uploadDest.toFile().renameTo(destFile);
+			}
+			Files.copy(file.getInputStream(), uploadDest);
+		} catch (Exception e) {
+			throw new RuntimeException("Could not store the file. Error: " + e.getMessage());
 		}
 	}
 
 	@Override
-	public String storeFile(MultipartFile file) throws Exception {
+	public byte[] load(String filePath) {
+		try {
+
+			Path file = this.getFileUploadRoot(filePath);
+
+			Resource resource = new UrlResource(file.toUri());
+			if (resource.exists() || resource.isReadable()) {
+				try (InputStream inputStream = resource.getInputStream();
+					 ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+
+					byte[] buffer = new byte[4096];
+					int bytesRead;
+					while ((bytesRead = inputStream.read(buffer)) != -1) {
+						outputStream.write(buffer, 0, bytesRead);
+					}
+
+					return outputStream.toByteArray();
+				} catch (IOException e) {
+					throw new RuntimeException("Error reading file content: " + e.getMessage());
+				}
+			} else {
+				throw new RuntimeException("COULD NOT READ THE FILE!");
+			}
+		} catch (MalformedURLException e) {
+			throw new RuntimeException("Error: " + e.getMessage());
+		}
+	}
+	@Override
+	public void deleteFile(String filePath) {
+		try {
+			Path file = this.getFileUploadRoot(filePath);
+			file.toFile().delete();
+		} catch (Exception e) {
+			LOG.error("Error: " + e.getMessage());
+		}
+	}
+
+	@Override
+	public String storeFile(MultipartFile file) {
 		String[] splitName = file.getOriginalFilename().split("\\.");
 		String extension = null;
 		if (splitName.length != 0) {
@@ -53,91 +93,29 @@ public class LocalFileService implements IFileService {
 		String fileName = RandomStringUtils.random(10, true, true) + "." + extension;
 
 		try {
-			// Check if the file's name contains invalid characters
-			if (fileName.contains("..")) {
-				throw new Exception("Sorry! Filename contains invalid path sequence " + fileName);
-			}
 
-			// Copy file to the target location (Replacing existing file with the same name)
-			Path targetLocation = this.fileStorageLocation.resolve(fileName);
-			Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
 
-			return fileName;
-		} catch (IOException ex) {
-			throw new Exception("Could not store file " + fileName + ". Please try again!", ex);
+			Path targetLocation = Paths.get(fileName);
+			Path fileStorageLocation = Paths.get(UPLOAD_DIR)
+					.toAbsolutePath().normalize();
+			Path path = fileStorageLocation.resolve(targetLocation);
+			Files.createDirectories(path.getParent());
+			Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+			return targetLocation.toString();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
 	}
 
-	@Override
-	public Resource loadFileAsResource(String fileName) throws Exception {
-		try {
-			Path filePath = this.fileStorageLocation.resolve(fileName).normalize();
-			Resource resource = new UrlResource(filePath.toUri());
-			if (resource.exists()) {
-				return resource;
-			} else {
-				throw new Exception("File not found " + fileName);
-			}
-		} catch (MalformedURLException ex) {
-			throw new Exception("File not found " + fileName, ex);
+	private Path getFileUploadRoot(String path) {
+		Path filePath = Paths.get(UPLOAD_DIR + File.separator + path);
+		if (filePath.toFile().exists() || filePath.toFile().mkdirs()) {
+			return filePath;
 		}
-	}
+		return Paths.get(UPLOAD_DIR);
+	};
 
-	@Override
-	public String storePdfFile(String resourceName, byte[] pdfFile) throws Exception {
-		String fileName = resourceName + ".pdf";
-		try {
-			// Copy file to the target location (Replacing existing file with the same name)
-			Path targetLocation = this.fileStorageLocation.resolve(fileName);
-			Files.copy(new ByteArrayInputStream(pdfFile), targetLocation, StandardCopyOption.REPLACE_EXISTING);
-
-			return fileName;
-		} catch (Exception ex) {
-			throw new Exception("Could not store file " + fileName + ". Please try again!", ex);
-		}
-	}
-
-	@Async
-	@Override
-	public void deleteFile(Media media) {
-		try {
-			Path filePath = this.fileStorageLocation.resolve(media.getMediaLabel()).normalize();
-			Files.delete(filePath);
-			// mediaService.deleteMedia(media.getId());
-		} catch (NoSuchFileException x) {
-			log.error("%s: no such" + " file", media.getMediaLabel());
-		} catch (IOException x) {
-			log.error(x.getMessage());
-		}
-	}
-
-	@Override
-	public Long getFileSize(String fileName) {
-		return Optional.ofNullable(fileName).map(file -> getAbsolutePath(fileName)).map(this::sizeFromFile).orElse(0L);
-	}
-
-	private Path getAbsolutePath(String fileName) {
-
-		Path filePath = this.fileStorageLocation.resolve(fileName).normalize();
-		return filePath;
-	}
-	
-	private Long sizeFromFile(Path path) {
-		try {
-			return Files.size(path);
-		} catch (IOException ioException) {
-			log.error("Error while getting the file size", ioException);
-		}
-		return 0L;
-	}
-
-	@Override
-	public byte[] readByteRangeNew(String fileName, long start, long end) throws Exception {
-		Path path = getAbsolutePath(fileName);
-		byte[] data = Files.readAllBytes(path);
-		byte[] result = new byte[(int) (end - start) + 1];
-		System.arraycopy(data, (int) start, result, 0, (int) (end - start) + 1);
-		return result;
-	}
-
+	private Path getFileUploadRoot() {
+		return Paths.get(UPLOAD_DIR);
+	};
 }

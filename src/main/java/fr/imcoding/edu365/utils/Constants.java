@@ -19,8 +19,15 @@ public class Constants {
   public static final String MAIL_SUBJECT_EXPERT_NEW_ANNOUNCEMENT = "Une nouvelle annonce publiée";
   public static final String MAIL_SUBJECT_USER_PUBLISHED_ANNOUNCEMENT = "Annonce publiée";
 
+  public static final String MAIL_SUBJECT_USER_PUBLISHED_COURSE = "Un nouveau cours est disponible pour vous";
+
+  public static final String MAIL_SETTING_DATE_PUBLISHED_COURSE = "Préparez-vous pour votre prochain cours en direct";
+
+  public static final String MAIL_SUBJECT_USER_PLANIFIED_PRESTATION = "Votre prochain cours sur Free Academy";
+
   public static final String MAIL_SUBJECT_EXPERT_OFFER_ACCEPTED = "Offre acceptée par l´annonceur";
   public static final String MAIL_SUBJECT_USER_NEW_OFFER = "Offre récue pour votre annonce";
+  public static final String  MAIL_SUBJECT_NOTIF_USER_PACK_SUBSCRIPTION = "Abonnement effectué avec succès";
   public static final String MAIL_SUBJECT_EXPERT_OFFER_DECLINED = "Offre réfusée par l´annonceur";
 
   public static final String MAIL_SUBJECT_EXPERT_OFFER_DECLINED_AFTER_ACCEPTED = "Offre réfusée par l´annonceur";

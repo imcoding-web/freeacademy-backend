@@ -39,7 +39,12 @@ public class UserBankDataService {
 
   public UserBankData updateUserBankData(UserBankDataDto userBankDataDto){
     UserBankData userBankData=getUserBankData(userBankDataDto.getExpertUuid());
+    if(userBankData == null) {
+      userBankData = new UserBankData();
+    }
     userBankData.setUnpaidAccumulatedBalance(userBankData.getUnpaidAccumulatedBalance()+(userBankDataDto.getAmmount()-userBankDataDto.getAmmount()*prestationComission/100));
+    userBankData.setAccumulatedBalance(userBankData.getAccumulatedBalance()+(userBankDataDto.getAmmount()-userBankDataDto.getAmmount()*prestationComission/100));
+
     return userBankDataRepository.save(userBankData);
   }
 

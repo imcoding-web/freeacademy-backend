@@ -1,19 +1,14 @@
 package fr.imcoding.edu365.rest;
 
+import fr.imcoding.edu365.persistence.entities.PrestationMeeting;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import fr.imcoding.edu365.business.services.PrestationService;
 import fr.imcoding.edu365.client.dtos.request.PrestationAdminRequest;
@@ -42,8 +37,13 @@ public class PrestationController {
   }
 
   @GetMapping(value = "/user-prestations")
-  public List<PrestationResponse> getUserPrestations(){
-    return prestationService.getUserPrestations();
+  public List<PrestationResponse> getUserPrestations(@RequestParam("show-finished") boolean showFinished){
+    return prestationService.getUserPrestations(showFinished);
+  }
+
+  @GetMapping(value = "/{prestationId}")
+  public PrestationResponse getPrestation(@PathVariable("prestationId") UUID prestationId){
+    return prestationService.getPrestation(prestationId);
   }
 
   @PatchMapping(value="/update-prestation",produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -86,6 +86,16 @@ public class PrestationController {
   @PostMapping(value = "/add")
   public void addPrestation(@ModelAttribute PrestationAdminRequest prestation) {
     prestationService.addPrestation(prestation);
+  }
+
+  @PostMapping("/set-prestation-date/{uuid}")
+  public ResponseEntity<Void> setTeacherCourseDate(@PathVariable(name = "uuid") UUID prestationId, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") LocalDateTime date) {
+    prestationService.setPrestationDate(prestationId, date);
+    return ResponseEntity.ok().build();
+  }
+  @GetMapping(value="/live")
+  public List<PrestationMeeting> getLivePrestations() {
+    return prestationService.getLivePrestations();
   }
 
 }

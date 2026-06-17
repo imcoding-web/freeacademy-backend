@@ -4,6 +4,7 @@ import fr.imcoding.edu365.business.services.InformationSeekerService;
 import fr.imcoding.edu365.client.dtos.response.UserResponse;
 import fr.imcoding.edu365.dtos.UserDetails;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,6 +33,12 @@ public class InformationSeekerController {
 @PatchMapping("/update-user")
   public UserDetails patchUser(@RequestBody UserDetails userRequest) {
     return this.informationSeekerService.patchUser(userRequest);
+  }
+
+  @GetMapping("/check-active-pack")
+  public ResponseEntity<Void> checkPack() {
+    boolean hasActivePackageackage = this.informationSeekerService.checkPack();
+    return hasActivePackageackage ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
   }
 
 

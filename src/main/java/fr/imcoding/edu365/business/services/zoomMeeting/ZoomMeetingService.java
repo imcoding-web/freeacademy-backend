@@ -1,8 +1,11 @@
 package fr.imcoding.edu365.business.services.zoomMeeting;
 
+import fr.imcoding.edu365.business.ext.zoom.response.ZoomMeetingsDTO;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Base64;
 
+import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -81,6 +84,27 @@ public class ZoomMeetingService {
     System.out.println("response::"+zoomMeetingObjectDTO);
 
     return zoomMeetingObjectDTO;
+  }
+
+  public List<ZoomMeetingObjectDTO> getLiveMeetings() {
+
+    RestTemplate restTemplate = new RestTemplate();
+    HttpHeaders headers = new HttpHeaders();
+    headers.add("Content-Type", "application/json");
+    ZoomAuthTokenDTO tokenDto = getZoomAuthToken();
+    headers.add("Authorization", "Bearer "+tokenDto.getAccessToken());
+    headers.setContentType(MediaType.APPLICATION_JSON);
+    HttpEntity<ZoomMeetingObjectDTO> httpEntity = new HttpEntity<ZoomMeetingObjectDTO>(
+        headers);
+    try {
+      ResponseEntity<ZoomMeetingsDTO> response = restTemplate.exchange("https://api.zoom.us/v2/users/me/meetings?type=live", HttpMethod.GET, httpEntity, ZoomMeetingsDTO.class);
+      return response.getBody().getMeetings();
+    } catch (Exception e) {
+      System.out.println(e);
+    }
+
+  return new ArrayList<>();
+
   }
   
   private ZoomAuthTokenDTO getZoomAuthToken() {

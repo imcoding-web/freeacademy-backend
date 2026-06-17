@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Repository;
 
@@ -23,6 +24,10 @@ public interface TeacherCourseRepository extends JpaRepository<TeacherCourse,Lon
 
   List<TeacherCourse> findTop6ByOrderByCreatedAtDesc();
   List<TeacherCourse> findTop6BySkillAreaSkillAreaCodeAndSkillSkillCodeOrderByCreatedAtDesc(String SkillAreaCode,String SkillCode);
+  @Query("SELECT tc FROM TeacherCourse tc WHERE TRIM(tc.title) = TRIM(:title)")
+  List<TeacherCourse> findByTitle(String title);
 
-
+  //used for migrations
+  List<TeacherCourse> findBySkillAreaIdAndSkillAreaSectionIdAndSkillId(Long skillAreaId, Long sectionId, Long skillId);
+  List<TeacherCourse> findBySkillAreaIdAndSkillAreaSectionIdAndSkillIdAndTitle(Long skillAreaId, Long sectionId, Long skillId, String title);
 }

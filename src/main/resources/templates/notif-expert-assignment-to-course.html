@@ -52,12 +52,18 @@
 									</a>
 								</td>
 							</tr>
-							<tr style="font-family: Inter, sans-serif; box-sizing: border-box; margin: 0;">
+							<tr th:if="${date}" style="font-family: Inter, sans-serif; box-sizing: border-box; margin: 0;">
+								<td style="margin: 10px 0px;" valign="top">
+									<p style="color: black; font-family: Inter; font-style: normal; font-weight: normal; font-size: 18px; line-height: 32px;margin-bottom: 35px;">La séance aura lieu le :<span
+											th:text="${date}" style="font-weight: bold;"></span></p>
+								</td>
+							</tr>
+							<tr th:if="${showInfoUser}" style="font-family: Inter, sans-serif; box-sizing: border-box; margin: 0;">
 								<td style="margin: 10px 0px;" valign="top">
 									<p style="color: black; font-family: Inter; font-style: normal; font-weight: normal; font-size: 18px; line-height: 32px;margin-bottom: 35px;"> On partage avec vous plus de détails sur l´élevé / étudiant  pour que vous puissiez se communiquer:</p>
 								</td>
 							</tr>
-							<tr style="font-family: Inter, sans-serif; box-sizing: border-box; margin: 0;">
+							<tr th:if="${showInfoUser}"  style="font-family: Inter, sans-serif; box-sizing: border-box; margin: 0;">
 								<td style="margin: 10px 0px;" valign="top">
 									<p style="color: black; font-family: Inter; font-style: normal; font-weight: normal; font-size: 18px; line-height: 32px;margin-bottom: 35px;"> Nom complet: <b><span th:text="${userFullName}"></span></b></p>
 									<p style="color: black; font-family: Inter; font-style: normal; font-weight: normal; font-size: 18px; line-height: 32px;margin-bottom: 35px;"> Email: <a th:text="${userEmail}" href="mailto:${userEmail}"></a></p>
@@ -67,12 +73,12 @@
 							</tr>
 							<tr style="font-family: Inter, sans-serif; box-sizing: border-box; margin: 0;">
 								<td style="margin: 10px 0px;" valign="top">
-									<p style="color: black; font-family: Inter; font-style: normal; font-weight: normal; font-size: 18px; line-height: 32px;margin-bottom: 35px;"> On vous invite de bien préparer le travail du l´élevé / étudiant et de respecter les délais mentionnés dans les détails de la prestation.</p>
+									<p style="color: black; font-family: Inter; font-style: normal; font-weight: normal; font-size: 18px; line-height: 32px;margin-bottom: 35px;"> On vous invite de bien préparer le travail et de respecter les délais mentionnés dans les détails de la prestation.</p>
 								</td>
 							</tr>
 							<tr style="font-family: Inter, sans-serif; box-sizing: border-box; margin: 0;">
 								<td style="margin: 10px 0px;" valign="top">
-									<p style="color: black; font-family: Inter; font-style: normal; font-weight: normal; font-size: 18px; line-height: 32px;margin-bottom: 35px;"> On vous invite également à partager avec nous tout document envoyé à l´élevé / étudiant. Pour nous envoyer tout ça, vous devez cliquer sur l´onglet "Mes prestations", allez vers l´annonce adéquat et joindre les documents. </p>
+									<p style="color: black; font-family: Inter; font-style: normal; font-weight: normal; font-size: 18px; line-height: 32px;margin-bottom: 35px;"> On vous invite également à partager avec nous tout document lié à cette prestation. Pour nous envoyer tout ça, vous devez cliquer sur l´onglet "Mes prestations", allez vers l´annonce adéquat et joindre les documents. </p>
 								</td>
 							</tr>
 							<tr style="font-family: Inter, sans-serif; box-sizing: border-box; margin: 0;">

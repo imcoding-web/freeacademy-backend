@@ -21,6 +21,7 @@ public class User_Details {
   private String userLastName;
   private String userDescription;
   private MediaDetails userProfilePicture;
+  private String currentSchool;
 
   public User_Details(UUID userUuid, String userFirstName, String userLastName,
       MediaDetails userProfilePicture) {

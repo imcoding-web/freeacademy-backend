@@ -31,6 +31,11 @@ public class TeacherCourseRequest {
   private List<MultipartFile> files = new ArrayList<>();
   private SkillAreaDto skillArea;
   private SkillDto skill;
+  private SkillAreaSectionDto skillAreaSection;
+  //private List<String> skillAreaSections;
   private List<MediaDto> medias;
   private Boolean isPremium;
+  private Boolean shouldBeDisplayed;
+
+
 }

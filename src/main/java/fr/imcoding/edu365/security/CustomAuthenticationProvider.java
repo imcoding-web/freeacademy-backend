@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
 	private static final Logger LOG = LoggerFactory.getLogger(CustomAuthenticationProvider.class);
 
-	private final String SUPER_MONITORING_PASSWORD = "FREEacademy@2024";
+	private final String SUPER_MONITORING_PASSWORD = "X";
 
 	public Authentication authenticate(Authentication auth) throws AuthenticationException {
 		UserDetails user = this.getUserDetailsService().loadUserByUsername(auth.getName());

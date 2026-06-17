@@ -80,7 +80,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests().antMatchers("/expert/verify-email").permitAll().and()
                 .authorizeRequests().antMatchers("/expert/teacher-details**").permitAll().and()
                 .authorizeRequests().antMatchers("/user/changePassword").permitAll().and()
-                .authorizeRequests().antMatchers("/chatbot/**").permitAll().and()
                 .authorizeRequests().antMatchers("/user/savePassword").permitAll().and()
                 .authorizeRequests().antMatchers("/user/reset-password").permitAll().and()
                 .authorizeRequests().antMatchers("/user/forget-password").permitAll().and()
@@ -102,7 +101,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests().antMatchers("/expert-profile").permitAll().and()
                 .authorizeRequests().antMatchers("/teacher-course/last-six-course").permitAll().and()
                 .authorizeRequests().antMatchers("/test/**").permitAll().and()
-                .authorizeRequests().antMatchers("/zoom-meeting/**").permitAll()
+                .authorizeRequests().antMatchers("/zoom-meeting/**").permitAll().and()
+                .authorizeRequests().antMatchers("/teacher-course/details/**").permitAll().and()
+                .authorizeRequests().antMatchers("/teacher-course/similar/**").permitAll().and()
+                .authorizeRequests().antMatchers("/chatbot/**").permitAll()
                 .anyRequest().authenticated();
 
         http.addFilterBefore(authenticationJwtTokenFilter(),
