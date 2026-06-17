@@ -1,0 +1,55 @@
+package fr.imcoding.edu365.persistence.specifications;
+
+import fr.imcoding.edu365.dtos.TeacherCourseSearchCriteria;
+import fr.imcoding.edu365.persistence.entities.Skill;
+import fr.imcoding.edu365.persistence.entities.SkillArea;
+import fr.imcoding.edu365.persistence.entities.TeacherCourse;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.JoinType;
+import javax.persistence.criteria.Predicate;
+import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.data.jpa.domain.Specification;
+
+/**
+ * @author Rokaya
+ * @Date 19/09/2023
+ */
+public class TeacherCourseSpecification {
+  public static Specification<TeacherCourse> createAnnouncementSpecifications(TeacherCourseSearchCriteria searchCriteria) {
+    return (root, query, builder) -> {
+      List<Predicate> predicates = new ArrayList<>();
+      if (searchCriteria.getSkillArea() != null && !searchCriteria.getSkillArea().isEmpty()) {
+        //Join<TeacherCourse, SkillArea> expertSkillAreaJoin = root.join("skills", JoinType.INNER);
+        Join<TeacherCourse, SkillArea> skillSkillAreaJoin = root.join("skillArea", JoinType.INNER);
+
+        predicates.add(skillSkillAreaJoin.get("skillAreaCode").in(searchCriteria.getSkillArea()));
+       // predicates.add(builder.equal(root.get("skillArea"), searchCriteria.getSkillArea()));
+      }
+      // Add your conditions based on the search criteria
+      if (searchCriteria.getSkill() != null && !searchCriteria.getSkill().isEmpty()) {
+        Join<TeacherCourse, Skill> courseSkillJoin = root.join("skill", JoinType.INNER);
+        predicates.add(courseSkillJoin.get("skillLabel").in(searchCriteria.getSkill()));
+      }
+
+      if (searchCriteria.getType() != null) {
+        predicates.add(builder.equal(root.get("type"), searchCriteria.getType()));
+      }
+
+      if (searchCriteria.getQuarter() != null) {
+        predicates.add(builder.equal(root.get("quarter"), searchCriteria.getQuarter()));
+      }
+
+      // Combine predicates using AND
+      return builder.and(predicates.toArray(new Predicate[0]));
+
+    };
+  }
+
+}
