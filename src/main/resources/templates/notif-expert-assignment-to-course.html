@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html style="font-family: Inter; font-style: normal; margin: 0;">
+<head>
+  <meta name="viewport" content="width=device-width" />
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Insert title here</title>
+  <style type="text/css">
+  a {
+    text-decoration: none !important;
+}
+    @media only screen and (max-width: 640px) {
+    	table {
+    		padding: 0 !important;
+    	}
+	}
+  </style>
+</head>
+<body  itemscope itemtype="http://schema.org/EmailMessage" style="font-family: 'Inter,sans-serif'; box-sizing: border-box; font-size: 14px; -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: none; width: 100% !important; height: 100%; line-height: 1.6em; background-color: #FFFFFF; margin: 0;" bgcolor="#FFFFFF">
+
+<table class="body-wrap" style="font-family: Inter, sans-serif; box-sizing: border-box; font-size: 14px; width: 100%; background-color: #FFFFFF; margin: 0; border-radius: 8px;" bgcolor="#FFFFFF">
+    <tr style="font-family: Inter, sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+		<td style="font-family: Inter, sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0;" valign="top"></td>
+		<td class="container" width="805" height="1096" style="font-family: Inter, sans-serif; box-sizing: border-box; vertical-align: top;" valign="top">
+			<table class="body-wrap" style="font-family: Inter, sans-serif; box-sizing: border-box; width: 100%; background-color: #FFFFFF; margin: 0; padding: 40px 10% 10%;" bgcolor="#FFFFFF">
+				<tr style="font-family: Inter, sans-serif; box-sizing: border-box; margin: 0;">
+					<td style="font-family: Inter, sans-serif; box-sizing: border-box; vertical-align: top; color: #fff; background-color: #FFFFFF;" bgcolor="#FFFFFF" valign="top">
+						<img style="border-radius: 16px; margin: 32px 0px; padding: 0 24px 0 80px;" th:src="${backendBaseUrl} + 'images/logo.png'"/>
+					</td>
+				</tr>
+				<tr style="font-family: Inter, sans-serif; box-sizing: border-box; margin: 0;">
+					<td style="font-family: Inter, sans-serif; box-sizing: border-box; vertical-align: top; color: #fff;" valign="top">
+						<table style="font-family: Inter, sans-serif; box-sizing: border-box; font-size: 12px; line-height: 16px; width: 100%; margin: 0; background-color: #FFFFFF; padding: 0 10% 10%;" bgcolor="#FFFFFF">
+							<tr style="font-family: Inter, sans-serif; box-sizing: border-box; margin: 0;">
+								<td style="margin: 10px 0px;" valign="top">
+									<h2 style="font-family: Inter; font-style: normal;font-weight: bold; font-size: 32px; line-height: 48px; color: #2D2D2D; margin: 32px 0px;">Commencez à préparer votre prestation!</h2>
+								</td>
+							</tr>
+							<tr style="font-family: Inter, sans-serif; box-sizing: border-box; margin: 0;">
+								<td style="margin: 10px 0px;" valign="top">
+									<img style="border-radius: 16px; margin: 32px 0px;" th:src="${backendBaseUrl} + 'images/start-preparing-prestation.png'"/>
+								</td>
+							</tr>
+							<tr style="font-family: Inter, sans-serif; box-sizing: border-box; margin: 0;">
+								<td style="margin: 10px 0px;" valign="top">
+									<p style="color: black; font-family: Inter; font-style: normal; font-weight: normal; font-size: 18px; line-height: 32px;margin-bottom: 35px;">Vous êtes assignés à une nouvelle prestation avec le titre  <b><span th:text="${announcementTitle}"></span></b>. Vous pouvez accéder aux détails de cette prestation via ce lien:
+								</td>
+							</tr>
+							<tr style="font-family: Inter, sans-serif; box-sizing: border-box; margin: 0;">
+								<td style="margin: 10px 0px;" valign="top">
+									<a th:href="${frontBaseUrl} + 'announcement/' + ${announcementUuid}" style="padding: 8px 24px; background: #1C3177; border-radius: 8px; margin: 5px 0px; height: 28px; font-family: Inter; display: inline-block;">
+										<span style="font-size: 16px; line-height: 24px; color: #FFFFFF; margin: 0px 3px; font-weight: 600; font-family: Inter;">Consulter la prestation</span>
+									</a>
+								</td>
+							</tr>
+							<tr th:if="${date}" style="font-family: Inter, sans-serif; box-sizing: border-box; margin: 0;">
+								<td style="margin: 10px 0px;" valign="top">
+									<p style="color: black; font-family: Inter; font-style: normal; font-weight: normal; font-size: 18px; line-height: 32px;margin-bottom: 35px;">La séance aura lieu le :<span
+											th:text="${date}" style="font-weight: bold;"></span></p>
+								</td>
+							</tr>
+							<tr th:if="${showInfoUser}" style="font-family: Inter, sans-serif; box-sizing: border-box; margin: 0;">
+								<td style="margin: 10px 0px;" valign="top">
+									<p style="color: black; font-family: Inter; font-style: normal; font-weight: normal; font-size: 18px; line-height: 32px;margin-bottom: 35px;"> On partage avec vous plus de détails sur l´élevé / étudiant  pour que vous puissiez se communiquer:</p>
+								</td>
+							</tr>
+							<tr th:if="${showInfoUser}"  style="font-family: Inter, sans-serif; box-sizing: border-box; margin: 0;">
+								<td style="margin: 10px 0px;" valign="top">
+									<p style="color: black; font-family: Inter; font-style: normal; font-weight: normal; font-size: 18px; line-height: 32px;margin-bottom: 35px;"> Nom complet: <b><span th:text="${userFullName}"></span></b></p>
+									<p style="color: black; font-family: Inter; font-style: normal; font-weight: normal; font-size: 18px; line-height: 32px;margin-bottom: 35px;"> Email: <a th:text="${userEmail}" href="mailto:${userEmail}"></a></p>
+									<p style="color: black; font-family: Inter; font-style: normal; font-weight: normal; font-size: 18px; line-height: 32px;margin-bottom: 35px;"> Numéro de téléphone: <b><span th:text="${userPhoneNumber}"></span></b></p>
+								
+								</td>
+							</tr>
+							<tr style="font-family: Inter, sans-serif; box-sizing: border-box; margin: 0;">
+								<td style="margin: 10px 0px;" valign="top">
+									<p style="color: black; font-family: Inter; font-style: normal; font-weight: normal; font-size: 18px; line-height: 32px;margin-bottom: 35px;"> On vous invite de bien préparer le travail et de respecter les délais mentionnés dans les détails de la prestation.</p>
+								</td>
+							</tr>
+							<tr style="font-family: Inter, sans-serif; box-sizing: border-box; margin: 0;">
+								<td style="margin: 10px 0px;" valign="top">
+									<p style="color: black; font-family: Inter; font-style: normal; font-weight: normal; font-size: 18px; line-height: 32px;margin-bottom: 35px;"> On vous invite également à partager avec nous tout document lié à cette prestation. Pour nous envoyer tout ça, vous devez cliquer sur l´onglet "Mes prestations", allez vers l´annonce adéquat et joindre les documents. </p>
+								</td>
+							</tr>
+							<tr style="font-family: Inter, sans-serif; box-sizing: border-box; margin: 0;">
+								<td style="margin: 10px 0px;" valign="top">
+									<p style="color: black; font-family: Inter; font-style: normal; font-weight: normal; font-size: 18px; line-height: 32px;margin-bottom: 35px;"> On vous rappelle que le paiement sera conditionné par l´envoi de ces documents. </p>
+								</td>
+							</tr>
+							<tr style="font-family: Inter, sans-serif; box-sizing: border-box; margin: 0;">
+								<td style="margin: 10px 0px;" valign="top">
+									<p style="color: black; font-family: Inter; font-style: normal; font-weight: normal; font-size: 18px; line-height: 32px;margin-bottom: 35px;"> Si vous avez des questions ou des soucis particuliers, vous pouvez nous contacter via email sur <a href="mailto:contact@freeacademy.tn">contact@freeacademy.tn</a> ou par téléphone sur +216 25274902.</p>
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+				<tr style="font-family: Inter, sans-serif; margin: 0px;">
+					<td style="margin: 10px 0px;" valign="top">
+						<table style="font-family: Inter, sans-serif; box-sizing: border-box; font-size: 12px; line-height: 16px; width: 100%; background: #FAFAFA; margin: 0; padding: 24px 10%;" bgcolor="#FAFAFA">
+							<tr style="font-family: Inter, sans-serif; box-sizing: border-box; margin: 0;">
+								<td style="padding: 5px 0px;" valign="top">
+									L'équipe de
+									Free Academy
+								</td>
+							</tr>
+							<tr style="font-family: Inter, sans-serif; box-sizing: border-box; margin: 0;">
+								<td style="padding: 5px 0px;" valign="top">
+									©2023 IM.
+									CODING (contact@freeacademy.tn / +216 25274902)
+								</td>
+							</tr>
+							<tr
+									style="font-family: Inter, sans-serif; box-sizing: border-box; margin: 0;">
+									<td style="padding: 5px 0px;" valign="top">
+										<table style="width: 100%;">
+											<tr>
+												<td><a th:href="${frontBaseUrl} + 'termes-of-use'">Conditions
+														d'utilisations</a> | <a
+													th:href="${frontBaseUrl} + 'privacy-policies'">Politiques de
+														confidentialités</a></td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+		</td>
+	 <td style="font-family: Inter, sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0;" valign="top"></td>
+      </tr>
+</table>
+</body>
+</html>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html style="font-family: Inter; font-style: normal; margin: 0;">
+<head>
+<meta name="viewport" content="width=device-width" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Insert title here</title>
+<style type="text/css">
+a {
+	text-decoration: none !important;
+}
+
+@media only screen and (max-width: 640px) {
+	table {
+		padding: 0 !important;
+	}
+}
+</style>
+</head>
+<body itemscope itemtype="http://schema.org/EmailMessage"
+	style="font-family: 'Inter,sans-serif'; box-sizing: border-box; font-size: 14px; -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: none; width: 100% !important; height: 100%; line-height: 1.6em; background-color: #FFFFFF; margin: 0;"
+	bgcolor="#FFFFFF">
+
+	<table class="body-wrap"
+		style="font-family: Inter, sans-serif; box-sizing: border-box; font-size: 14px; width: 100%; background-color: #FFFFFF; margin: 0; border-radius: 8px;"
+		bgcolor="#FFFFFF">
+		<tr
+			style="font-family: Inter, sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+			<td
+				style="font-family: Inter, sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0;"
+				valign="top"></td>
+			<td class="container" width="805" height="1096"
+				style="font-family: Inter, sans-serif; box-sizing: border-box; vertical-align: top;"
+				valign="top">
+				<table class="body-wrap"
+					style="font-family: Inter, sans-serif; box-sizing: border-box; width: 100%; background-color: #FFFFFF; margin: 0; padding: 40px 10% 10%;"
+					bgcolor="#FFFFFF">
+					<tr
+						style="font-family: Inter, sans-serif; box-sizing: border-box; margin: 0;">
+						<td
+							style="font-family: Inter, sans-serif; box-sizing: border-box; vertical-align: top; color: #fff; background-color: #FFFFFF;"
+							bgcolor="#FFFFFF" valign="top"><img
+							style="border-radius: 16px; margin: 32px 0px; padding: 0 24px 0 70px;"
+							th:src="${backendBaseUrl} + 'images/logo.png'" /></td>
+					</tr>
+					<tr
+						style="font-family: Inter, sans-serif; box-sizing: border-box; margin: 0;">
+						<td
+							style="font-family: Inter, sans-serif; box-sizing: border-box; vertical-align: top; color: #fff;"
+							valign="top">
+							<table
+								style="font-family: Inter, sans-serif; box-sizing: border-box; font-size: 12px; line-height: 16px; width: 100%; margin: 0; background-color: #FFFFFF; padding: 0 10% 10%;"
+								bgcolor="#FFFFFF">
+								<tr
+									style="font-family: Inter, sans-serif; box-sizing: border-box; margin: 0;">
+									<td style="margin: 10px 0px;" valign="top">
+										<h2
+											style="font-family: Inter; font-style: normal; font-weight: bold; font-size: 32px; line-height: 48px; color: #2D2D2D; margin: 32px 0px;">
+											Votre compte est vérifié et publié!</h2>
+									</td>
+								</tr>
+								<tr
+									style="font-family: Inter, sans-serif; box-sizing: border-box; margin: 0;">
+									<td style="margin: 10px 0px;" valign="top"><img
+										style="border-radius: 16px; margin: 32px 0px;"
+										th:src="${backendBaseUrl} + 'images/validate-expert.png'" /></td>
+								</tr>
+								<tr
+									style="font-family: Inter, sans-serif; box-sizing: border-box; margin: 0;">
+									<td style="margin: 10px 0px;" valign="top">
+										<p
+											style="color: black; font-family: Inter; font-style: normal; font-weight: normal; font-size: 18px; line-height: 32px; margin-bottom: 35px;">
+											Félicitations! la vérification de votre compte Free Academy a été
+											bien aboutie. Un tag vert a été ajouté à votre profil pour mentionner que les informations de votre profil ont été bien vérifiées. Vous pouvez dès maintenant commencer à publier des supports éducatifs, donner des cours de support pour nos éleves ou étudiants et proposer des offres aux différentes annonces publiées. </p>
+									</td>
+								</tr>
+								<tr th:if="${isExist == false}"
+									style="font-family: Inter, sans-serif; box-sizing: border-box; margin: 0;">
+									<td style="margin: 10px 0px;" valign="top">
+										<p
+											style="color: black; font-family: Inter; font-style: normal; font-weight: normal; font-size: 18px; line-height: 32px; margin-bottom: 35px;">
+											Vous pouvez accéder à votre compte Free Academy via ce mot de passe:  </p>
+										<p style="color: black; font-family: Inter; font-style: normal; font-weight: normal; font-size: 18px; line-height: 32px;margin-bottom: 35px;"> Mot de passe initial : <b><span th:text="${expertPassword}"></span></b></p>
+										<p
+											style="color: black; font-family: Inter; font-style: normal; font-weight: normal; font-size: 18px; line-height: 32px; margin-bottom: 35px;">
+											Une fois connectée avec le mot de passe initial crée par défaut par notre systéme, on vous invite de le modifier via les paramétres de votre profil.   </p>	
+									</td>
+								</tr>
+								<tr
+									style="font-family: Inter, sans-serif; box-sizing: border-box; margin: 0;">
+									<td style="margin: 10px 0px;" valign="top">
+										<p
+											style="color: black; font-family: Inter; font-style: normal; font-weight: normal; font-size: 18px; line-height: 32px; margin-bottom: 35px;">
+											Selon les informations fournis au moment d’enregistrement de votre profil, vous êtes assignés à enseigner : </p>
+									</td>
+								</tr>
+								<tr style="font-family: Inter, sans-serif; box-sizing: border-box; margin: 0;">
+									<td style="margin: 10px 0px;" valign="top">
+										<p style="color: black; font-family: Inter; font-style: normal; font-weight: normal; font-size: 18px; line-height: 32px;margin-bottom: 35px;"> Matiére : <b><span th:text="${expertSkill}"></span></b></p>
+										<p style="color: black; font-family: Inter; font-style: normal; font-weight: normal; font-size: 18px; line-height: 32px;margin-bottom: 35px;"> Niveau d’étude  : <b><span th:text="${expertSkillArea}"></span></b></p>
+								
+									</td>
+								</tr>
+								<tr
+									style="font-family: Inter, sans-serif; box-sizing: border-box; margin: 0;">
+									<td style="margin: 10px 0px;" valign="top">
+										<p
+											style="color: black; font-family: Inter; font-style: normal; font-weight: normal; font-size: 18px; line-height: 32px; margin-bottom: 35px;">
+											Pour avoir plus de la chance d’être choisi pour des prestations d’enseignement sur notre platforme, on vous invite de nous envoyer d’une façon continue, via notre email, des supports éducatifs pour la matiére et niveau d’étude auxquels vous étés assignés. Ces supports seront présentés à nos étudiants sous votre nom dans un cadre de publicité de votre profil. Ces supports éducatifs peuvent etre des cours, des explications de cours, des exercices corrigés, des examens corrigés, etc. Pour chaque support publié, on va inviter l’élève / l’étudiant à vous contacter pour une séance en ligne à fin de lui expliquer en détails le cours ou l’exercice publié ou d’autres cours ou exercices.   </p>
+									</td>
+								</tr>
+								
+								
+								<tr
+									style="font-family: Inter, sans-serif; box-sizing: border-box; margin: 0;">
+									<td
+										style="margin: 10px 0px; color: black; font-family: Inter; font-style: normal; font-weight: normal; font-size: 18px; line-height: 32px;"
+										valign="top">
+										<p style="line-height: 18px; margin: 2px;">L'équipe de
+											Free Academy</p>
+									</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+					<tr style="font-family: Inter, sans-serif; margin: 0px;">
+						<td style="margin: 10px 0px;" valign="top">
+							<table
+								style="font-family: Inter, sans-serif; box-sizing: border-box; font-size: 12px; line-height: 16px; width: 100%; background: #FAFAFA; margin: 0; padding: 24px 10%;"
+								bgcolor="#FAFAFA">
+								<tr
+									style="font-family: Inter, sans-serif; box-sizing: border-box; margin: 0;">
+									<td style="padding: 5px 0px;" valign="top">©2022 IM.
+										CODING (email: contact@imcoding.fr / whatsapp: +216 25274902)</td>
+								</tr>
+								<tr
+									style="font-family: Inter, sans-serif; box-sizing: border-box; margin: 0;">
+									<td style="padding: 5px 0px;" valign="top">
+										<table style="width: 100%;">
+											<tr>
+												<td><a th:href="${frontBaseUrl} + 'termes-of-use'">Conditions
+														d'utilisations</a> | <a
+													th:href="${frontBaseUrl} + 'privacy-policies'">Politiques de
+														confidentialités</a></td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+				</table>
+			</td>
+			<td
+				style="font-family: Inter, sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0;"
+				valign="top"></td>
+		</tr>
+	</table>
+</body>
+</html>
