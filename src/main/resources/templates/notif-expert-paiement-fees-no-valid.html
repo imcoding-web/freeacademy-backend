@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html style="font-family: Inter; font-style: normal; margin: 0;">
+<head>
+  <meta name="viewport" content="width=device-width" />
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Insert title here</title>
+  <style type="text/css">
+  a {
+    text-decoration: none !important;
+}
+    @media only screen and (max-width: 640px) {
+    	table {
+    		padding: 0 !important;
+    	}
+	}
+  </style>
+</head>
+<body  itemscope itemtype="http://schema.org/EmailMessage" style="font-family: 'Inter,sans-serif'; box-sizing: border-box; font-size: 14px; -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: none; width: 100% !important; height: 100%; line-height: 1.6em; background-color: #FFFFFF; margin: 0;" bgcolor="#FFFFFF">
+
+<table class="body-wrap" style="font-family: Inter, sans-serif; box-sizing: border-box; font-size: 14px; width: 100%; background-color: #FFFFFF; margin: 0; border-radius: 8px;" bgcolor="#FFFFFF">
+    <tr style="font-family: Inter, sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+		<td style="font-family: Inter, sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0;" valign="top"></td>
+		<td class="container" width="805" height="1096" style="font-family: Inter, sans-serif; box-sizing: border-box; vertical-align: top;" valign="top">
+			<table class="body-wrap" style="font-family: Inter, sans-serif; box-sizing: border-box; width: 100%; background-color: #FFFFFF; margin: 0; padding: 40px 10% 10%;" bgcolor="#FFFFFF">
+				<tr style="font-family: Inter, sans-serif; box-sizing: border-box; margin: 0;">
+					<td style="font-family: Inter, sans-serif; box-sizing: border-box; vertical-align: top; color: #fff; background-color: #FFFFFF;" bgcolor="#FFFFFF" valign="top">
+						<img style="border-radius: 16px; margin: 32px 0px; padding: 0 24px 0 80px;" th:src="${backendBaseUrl} + 'images/logo.png'"/>
+					</td>
+				</tr>
+				<tr style="font-family: Inter, sans-serif; box-sizing: border-box; margin: 0;">
+					<td style="font-family: Inter, sans-serif; box-sizing: border-box; vertical-align: top; color: #fff;" valign="top">
+						<table style="font-family: Inter, sans-serif; box-sizing: border-box; font-size: 12px; line-height: 16px; width: 100%; margin: 0; background-color: #FFFFFF; padding: 0 10% 10%;" bgcolor="#FFFFFF">
+							<tr style="font-family: Inter, sans-serif; box-sizing: border-box; margin: 0;">
+								<td style="margin: 10px 0px;" valign="top">
+									<h2 style="font-family: Inter; font-style: normal;font-weight: bold; font-size: 32px; line-height: 48px; color: #2D2D2D; margin: 32px 0px;">Le paiement des frais de votre inscription est refusé!</h2>
+								</td>
+							</tr>
+							<tr style="font-family: Inter, sans-serif; box-sizing: border-box; margin: 0;">
+								<td style="margin: 10px 0px;" valign="top">
+									<img style="border-radius: 16px; margin: 32px 0px;" th:src="${backendBaseUrl} + 'images/user-refuse-offer.png'"/>
+								</td>
+							</tr>
+							<tr style="font-family: Inter, sans-serif; box-sizing: border-box; margin: 0;">
+								<td style="margin: 10px 0px;" valign="top">
+									<p style="color: black; font-family: Inter; font-style: normal; font-weight: normal; font-size: 18px; line-height: 32px;margin-bottom: 35px;"> Malheureusement, votre paiement des frais de votre inscription n'a pas été validée par l'administration de la platforme Free Academy.
+								</td>
+							</tr>
+							
+							<tr style="font-family: Inter, sans-serif; box-sizing: border-box; margin: 0;">
+								<td style="margin: 10px 0px;" valign="top">
+									<p style="color: black; font-family: Inter; font-style: normal; font-weight: normal; font-size: 18px; line-height: 32px;margin-bottom: 35px;"> L'administration vous a laissé le message suivant: </p>
+									<p style="color: black; font-family: Inter; font-style: normal; font-weight: normal; font-size: 18px; line-height: 32px;margin-bottom: 35px;"> <b><span
+                      th:text="${refusalReason}"></span></b>
+                  </p>
+								</td>
+							</tr>
+							
+							<tr style="font-family: Inter, sans-serif; box-sizing: border-box; margin: 0;">
+								<td style="margin: 10px 0px;" valign="top">
+									<p style="color: black; font-family: Inter; font-style: normal; font-weight: normal; font-size: 18px; line-height: 32px;margin-bottom: 35px;"> Si vous avez des questions ou des soucis particuliers, vous pouvez nous contacter via email sur <a href="mailto:contact@imcoding.fr">contact@imcoding.fr</a> ou par téléphone sur +216 25274902.</p>
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+				<tr style="font-family: Inter, sans-serif; margin: 0px;">
+					<td style="margin: 10px 0px;" valign="top">
+						<table style="font-family: Inter, sans-serif; box-sizing: border-box; font-size: 12px; line-height: 16px; width: 100%; background: #FAFAFA; margin: 0; padding: 24px 10%;" bgcolor="#FAFAFA">
+							<tr style="font-family: Inter, sans-serif; box-sizing: border-box; margin: 0;">
+								<td style="padding: 5px 0px;" valign="top">
+									L'équipe de
+									Free Academy
+								</td>
+							</tr>
+							<tr style="font-family: Inter, sans-serif; box-sizing: border-box; margin: 0;">
+								<td style="padding: 5px 0px;" valign="top">
+									©2022 IM.
+									CODING (contact@imcoding.fr / +216 25274902)
+								</td>
+							</tr>
+							<tr
+									style="font-family: Inter, sans-serif; box-sizing: border-box; margin: 0;">
+									<td style="padding: 5px 0px;" valign="top">
+										<table style="width: 100%;">
+											<tr>
+												<td><a th:href="${frontBaseUrl} + 'termes-of-use'">Conditions
+														d'utilisations</a> | <a
+													th:href="${frontBaseUrl} + 'privacy-policies'">Politiques de
+														confidentialités</a></td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+		</td>
+	 <td style="font-family: Inter, sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0;" valign="top"></td>
+      </tr>
+</table>
+</body>
+</html>

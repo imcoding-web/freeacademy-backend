@@ -1,0 +1,37 @@
+### Builder
+target/
+build/
+out/
+gen/
+.gradle/
+local.properties
+
+### IntelliJ
+.idea/
+*.iml
+*.ipr
+*.iws
+
+### Eclipse
+.settings/
+.project
+.classpath
+.mymetadata
+
+### Package Files
+*.jar
+*.war
+*.ear
+
+### Other
+.DS_Store
+*.log
+*.bak
+
+### Secrets
+src/main/resources/application-local.properties
+
+src/main/resources/config/dialogflow-credentials.json
+
+# Google credentials
+src/main/resources/config/*.json

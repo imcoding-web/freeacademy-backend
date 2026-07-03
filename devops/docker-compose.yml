@@ -1,0 +1,27 @@
+version: "3.3"
+services:
+  mysqldb:
+    image: mysql:5.7
+    restart: unless-stopped
+    env_file: ./.env
+    environment:
+      - MYSQL_ROOT_PASSWORD=$MYSQLDB_ROOT_PASSWORD
+      - MYSQL_DATABASE=$MYSQLDB_DATABASE
+    ports:
+      - "3307:3306"
+    volumes:
+      - db:/var/lib/mysql
+      
+  freeacademy-backend:
+    container_name: freeacademy-backend
+    depends_on:
+      - mysqldb
+    build:
+      context: ../
+      dockerfile: ./devops/Dockerfile
+    ports:
+      - "9000:8099"
+  
+volumes:
+  db:
+
