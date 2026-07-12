@@ -15,7 +15,10 @@ import java.util.UUID;
 public class ChatbotController {
 
     private final ChatbotService chatbotService;
-
+    @GetMapping("/history")
+    public ResponseEntity<?> getHistory() {
+        return ResponseEntity.ok(chatbotService.getHistory());
+    }
     @PostMapping("/message")
     public ResponseEntity<?> chat(@RequestBody Map<String, String> request) {
         try {
