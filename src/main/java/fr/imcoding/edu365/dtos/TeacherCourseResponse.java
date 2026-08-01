@@ -1,7 +1,9 @@
-package fr.imcoding.edu365.dtos;
+﻿package fr.imcoding.edu365.dtos;
 
+import fr.imcoding.edu365.enumeration.CoursePublicationStatus;
 import fr.imcoding.edu365.enumeration.CourseType;
 import fr.imcoding.edu365.enumeration.Quarter;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -36,9 +38,10 @@ public class TeacherCourseResponse {
   private SkillDto skill;
   private Boolean isPremium;
   private Boolean shouldBeDisplayed;
+  private CoursePublicationStatus publicationStatus;
+  private LocalDateTime plannedPublicationDateTime;
   private LessonCorrectionResponse lessonCorrection;
   //ajouter pour afficger les detailsd e la correction
   private CourseCreatorDto courseCreator;
-
 
 }

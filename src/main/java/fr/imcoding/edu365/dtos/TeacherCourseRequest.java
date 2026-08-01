@@ -1,8 +1,11 @@
-package fr.imcoding.edu365.dtos;
+﻿package fr.imcoding.edu365.dtos;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import fr.imcoding.edu365.enumeration.CoursePublicationStatus;
 import fr.imcoding.edu365.enumeration.CourseType;
 import fr.imcoding.edu365.enumeration.Quarter;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -11,6 +14,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -36,6 +40,10 @@ public class TeacherCourseRequest {
   private List<MediaDto> medias;
   private Boolean isPremium;
   private Boolean shouldBeDisplayed;
+  private CoursePublicationStatus publicationStatus;
 
+  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+  @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+  private LocalDateTime plannedPublicationDateTime;
 
 }

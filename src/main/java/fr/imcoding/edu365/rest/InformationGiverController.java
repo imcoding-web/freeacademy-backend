@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.*;
  * @Date 13/06/2022
  */
 @RestController
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:4201", allowedHeaders = "*", allowCredentials = "true")
 @RequestMapping("/expert")
 @RequiredArgsConstructor
 public class InformationGiverController {

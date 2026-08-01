@@ -1,6 +1,7 @@
-package fr.imcoding.edu365.persistence.entities;
+﻿package fr.imcoding.edu365.persistence.entities;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import fr.imcoding.edu365.enumeration.CoursePublicationStatus;
 import fr.imcoding.edu365.enumeration.CourseType;
 import fr.imcoding.edu365.enumeration.Quarter;
 
@@ -59,5 +60,13 @@ public class TeacherCourse extends BaseEntity {
 	private Boolean isPremium;
 
 	private Boolean shouldBeDisplayed;
+
+	@Enumerated(EnumType.STRING)
+	@Column(name = "publication_status")
+	private CoursePublicationStatus publicationStatus;
+
+	@JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+	@Column(name = "planned_publication_date_time")
+	private LocalDateTime plannedPublicationDateTime;
 
 }

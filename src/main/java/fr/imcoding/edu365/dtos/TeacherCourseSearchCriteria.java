@@ -1,5 +1,6 @@
-package fr.imcoding.edu365.dtos;
+﻿package fr.imcoding.edu365.dtos;
 
+import fr.imcoding.edu365.enumeration.CoursePublicationStatus;
 import fr.imcoding.edu365.enumeration.CourseType;
 import fr.imcoding.edu365.enumeration.Quarter;
 import lombok.AllArgsConstructor;
@@ -22,5 +23,6 @@ public class TeacherCourseSearchCriteria {
   private CourseType type;
   private Quarter quarter;
   private Boolean shouldBeDisplayed;
+  private CoursePublicationStatus publicationStatus;
 
 }

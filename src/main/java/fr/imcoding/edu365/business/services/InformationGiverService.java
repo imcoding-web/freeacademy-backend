@@ -9,11 +9,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import javax.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -431,6 +432,7 @@ public class InformationGiverService {
 		return informationGiverRepository.findBySkillsSkillCode(skillCode);
 	}
 
+	@Transactional(readOnly = true)
 	public List<ValidationExpertResponse> recoverValidationList(String validationStatus) {
 
 		List<VerifiedExpert> data;
@@ -443,6 +445,8 @@ public class InformationGiverService {
 
 	}
 	
+
+	@Transactional(readOnly = true)
 	public List<ValidationExpertResponse> recoverTeahcerInscriptionRequests() {
 
 		List<TeacherRegisterRequest> data = teacherRegisterRequestRepository.findAll();
@@ -451,6 +455,7 @@ public class InformationGiverService {
 
 	}
 
+	@Transactional
 	public void confirmValidation(UUID validationUuid) {
 		VerifiedExpert data = verifiedExpertRepository.findByUuid(validationUuid);
 		if (data != null && data.getStatus() == ValidationStatus.PARTIAL) {
@@ -471,6 +476,7 @@ public class InformationGiverService {
 		}
 	}
 
+	@Transactional
 	public void refuseValidation(UUID validationUuid, MessageRequestDto messageRequestDto) {
 		// update status
 		VerifiedExpert data = verifiedExpertRepository.findByUuid(validationUuid);
@@ -489,10 +495,14 @@ public class InformationGiverService {
 		}
 	}
 
+
+	@Transactional(readOnly = true)
 	public List<ExpertResponse> getExpertList() {
-		List<InformationGiver> data;
-		data = informationGiverRepository.findAll();
-		return data.stream().map(expertDetailsMapper::toExpertResponse).collect(Collectors.toList());
+		List<InformationGiver> data = informationGiverRepository.findByAccountStatus(AccountStatus.ACTIVE);
+		return data.stream()
+				.map(expertDetailsMapper::toExpertResponse)
+				.filter(Objects::nonNull)
+				.collect(Collectors.toList());
 	}
 
 	public List<InformationGiver> getAllExpert() {
@@ -518,6 +528,7 @@ public class InformationGiverService {
 		return informationGiverRepository.findByAccountStatus(accountStatus);
 	}
 
+	@Transactional
 	public void registerTeacher(ExpertRegisterRequest registerRequest) throws Exception {
 		TeacherRegisterRequest user = new TeacherRegisterRequest();
 
@@ -577,7 +588,7 @@ public class InformationGiverService {
 		return userRepository.findByUserEmail(userEmail).isPresent()
 				|| teacherRegisterRequestRepository.findByUserEmail(userEmail).isPresent();
 	}
-
+	@Transactional(readOnly = true)
 	public ValidationExpertResponse getTeacherRequest(UUID registerRequestUuid) {
 		TeacherRegisterRequest request = teacherRegisterRequestRepository.findByUuid(registerRequestUuid).orElse(null);
 		if (request == null)
@@ -586,6 +597,7 @@ public class InformationGiverService {
 
 	}
 	
+	@Transactional
 	public void validateTeacherRequest(UUID registerRequestUuid, String assignedCourseCode ) {
 		TeacherRegisterRequest request = teacherRegisterRequestRepository.findByUuid(registerRequestUuid).orElse(null);
 		if (request == null)
@@ -609,7 +621,7 @@ public class InformationGiverService {
 		initiateBankdata(informationGiver.getUuid());
 
 		
-		//supprimer le request une fois le compte est valdié
+		//supprimer le request une fois le compte est valide
 		teacherRegisterRequestRepository.delete(request);
 		
 		// send email to user
@@ -671,3 +683,11 @@ public class InformationGiverService {
 	}
 
 }
+
+
+
+
+
+
+
+

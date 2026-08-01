@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @Date 08/11/2022
  */
 @RestController
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:4201", allowedHeaders = "*", allowCredentials = "true")
 @RequestMapping("/verified-expert")
 @RequiredArgsConstructor
 public class VerifiedExpertController {

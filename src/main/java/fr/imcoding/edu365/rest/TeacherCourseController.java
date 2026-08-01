@@ -1,4 +1,4 @@
-package fr.imcoding.edu365.rest;
+﻿package fr.imcoding.edu365.rest;
 
 import fr.imcoding.edu365.business.services.LessonCorrectionService;
 import fr.imcoding.edu365.business.services.TeacherCourseCorrectionService;
@@ -12,12 +12,9 @@ import fr.imcoding.edu365.enumeration.Quarter;
 import fr.imcoding.edu365.persistence.entities.TeacherCourse;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.repository.config.ResourceReaderRepositoryPopulatorBeanDefinitionParser;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,9 +25,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -73,6 +69,16 @@ public class TeacherCourseController {
   public TeacherCourse updateTeacherCourse(@ModelAttribute TeacherCourseRequest teacherCourseRequest) {
     return this.teacherCourseService.updateTeacherCourse(teacherCourseRequest);
   }
+
+  @PatchMapping(value="/publication-schedule/{courseUuid}", produces = MediaType.APPLICATION_JSON_VALUE)
+  public TeacherCourseResponse updateTeacherCoursePublicationSchedule(
+      @PathVariable UUID courseUuid,
+      @RequestParam(name = "plannedPublicationDateTime", required = false)
+      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+      LocalDateTime plannedPublicationDateTime) {
+    return this.teacherCourseService.updateTeacherCoursePublicationSchedule(courseUuid, plannedPublicationDateTime);
+  }
+
   @PatchMapping(value="/update-visibility/{courseUuid}")
   public void updateCourseVisibility(@PathVariable("courseUuid") UUID courseId, @RequestParam("shouldBeDisplayed") Boolean shouldBeDisplayed) {
      this.teacherCourseService.updateCourseVisibility(courseId, shouldBeDisplayed);

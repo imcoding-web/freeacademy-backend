@@ -1,4 +1,4 @@
-package fr.imcoding.edu365.business.mappers;
+﻿package fr.imcoding.edu365.business.mappers;
 
 import fr.imcoding.edu365.persistence.entities.SkillSubscription;
 import fr.imcoding.edu365.persistence.repositories.SkillSubscriptionRepository;
@@ -13,6 +13,7 @@ import fr.imcoding.edu365.dtos.CourseCreatorDto;
 import fr.imcoding.edu365.dtos.LessonCorrectionResponse;
 import fr.imcoding.edu365.dtos.TeacherCourseDetails;
 import fr.imcoding.edu365.dtos.TeacherCourseResponse;
+import fr.imcoding.edu365.enumeration.CoursePublicationStatus;
 import fr.imcoding.edu365.enumeration.PackageStatus;
 import fr.imcoding.edu365.persistence.entities.InformationSeeker;
 import fr.imcoding.edu365.persistence.entities.LessonCorrection;
@@ -51,6 +52,8 @@ public class TeacherCourseMapper {
         .medias(teacherCourse.getMedias().stream().map(mediaMapper::toMediaDetails).collect(
             Collectors.toList())).isPremium(teacherCourse.getIsPremium())
 			.shouldBeDisplayed(teacherCourse.getShouldBeDisplayed())
+			.publicationStatus(resolvePublicationStatus(teacherCourse))
+			.plannedPublicationDateTime(teacherCourse.getPlannedPublicationDateTime())
 			.build();
   }
   
@@ -66,7 +69,10 @@ public class TeacherCourseMapper {
 						: null)
 				.medias(teacherCourse.getMedias().stream().map(media -> mediaMapper.toMediaDetails(media))
 						.collect(Collectors.toList()))
-				.isPremium(teacherCourse.getIsPremium()).build();
+				.isPremium(teacherCourse.getIsPremium())
+				.publicationStatus(resolvePublicationStatus(teacherCourse))
+				.plannedPublicationDateTime(teacherCourse.getPlannedPublicationDateTime())
+				.build();
 	}
 
 	public TeacherCourseResponse toTeacherCourseResponseWithDetailedCorrection(TeacherCourse teacherCourse,
@@ -76,8 +82,8 @@ public class TeacherCourseMapper {
 				.courseCreator(teacherCourse.getCreator()!=null?CourseCreatorDto.builder()
 			            .userDetails(userMapper.toUserDetails(teacherCourse.getCreator()))
 			            .skill(teacherCourse.getCreator() != null ? 
-			            		skillMapper.toSkillDto(teacherCourse.getCreator().getSkills().stream().findFirst().orElse(null))
-			            		: null)
+			            	skillMapper.toSkillDto(teacherCourse.getCreator().getSkills().stream().findFirst().orElse(null))
+			            	: null)
 			            .build():null)
 				.quarter(teacherCourse.getQuarter()).skill(skillMapper.toSkillDto(teacherCourse.getSkill()))
 				.skillArea(skillAreaMapper.toSkillAreaDto(teacherCourse.getSkillArea()))
@@ -86,6 +92,8 @@ public class TeacherCourseMapper {
 						.medias(lessonCorrection.getMedias().stream().map(media -> mediaMapper.toMediaDetails(media))
 								.collect(Collectors.toList()))
 						.onlySubscribedUsers(lessonCorrection.isOnlySubscribedUsers()).build() : null)
+				.publicationStatus(resolvePublicationStatus(teacherCourse))
+				.plannedPublicationDateTime(teacherCourse.getPlannedPublicationDateTime())
 				.build();
 	}
 
@@ -95,11 +103,13 @@ public class TeacherCourseMapper {
         .skill(skillMapper.toSkillDto(teacherCourse.getSkill()))
         .skillArea(skillAreaMapper.toSkillAreaDto(teacherCourse.getSkillArea()))
 			.isPremium(teacherCourse.getIsPremium())
+        .publicationStatus(resolvePublicationStatus(teacherCourse))
+        .plannedPublicationDateTime(teacherCourse.getPlannedPublicationDateTime())
         .courseCreator(teacherCourse.getCreator()!=null?CourseCreatorDto.builder()
             .userDetails(userMapper.toTeacherDetails(teacherCourse.getCreator()))
             .skill(teacherCourse.getCreator() != null ? 
-            		skillMapper.toSkillDto(teacherCourse.getCreator().getSkills().stream().findFirst().orElse(null))
-            		: null)
+            	skillMapper.toSkillDto(teacherCourse.getCreator().getSkills().stream().findFirst().orElse(null))
+            	: null)
             .build():null)
 			.section(teacherCourse.getSkillAreaSection().getLabel())
         .build();
@@ -107,10 +117,10 @@ public class TeacherCourseMapper {
 
   public TeacherCourseDetails toTeacherCourseDetailsFilter(TeacherCourse teacherCourse){
 	  InformationSeeker student = (InformationSeeker) userService.getCurrentUser();
-	  // Tester si l'etudiante st inscrit à un apck en entier => il a acces à toutes les séances
+	  // Tester si l'etudiante st inscrit Ã  un apck en entier => il a acces Ã  toutes les sÃ©ances
 		boolean hasSubscription = subscriptionRepository.existsByStudentAndSubscriptionStatus(student,
 				PackageStatus.ACTIVE);
-		// Si non, on va vérifier si l'étudiant est inscrit à un matiére bien donné
+		// Si non, on va vÃ©rifier si l'Ã©tudiant est inscrit Ã  un matiÃ©re bien donnÃ©
 	  if(!hasSubscription) {
 		  List<SkillSubscription> subscriptionsToSkills = skillSubscriptionRepository.findByStudentAndSubscriptionStatus(student,
 				  PackageStatus.ACTIVE);
@@ -123,6 +133,8 @@ public class TeacherCourseMapper {
         .courseUuid(teacherCourse.getUuid())
         .skill(skillMapper.toSkillDto(teacherCourse.getSkill()))
         .skillArea(skillAreaMapper.toSkillAreaDto(teacherCourse.getSkillArea()))
+        .publicationStatus(resolvePublicationStatus(teacherCourse))
+        .plannedPublicationDateTime(teacherCourse.getPlannedPublicationDateTime())
         .courseCreator(teacherCourse.getCreator()!=null?CourseCreatorDto.builder()
             .userDetails(userMapper.toUserDetail(teacherCourse.getCreator()))
             .skill(teacherCourse.getCreator() != null ?
@@ -139,6 +151,8 @@ public class TeacherCourseMapper {
         .courseUuid(teacherCourse.getUuid()).description(teacherCourse.getDescription())
         .skill(skillMapper.toSkillDto(teacherCourse.getSkill()))
         .skillArea(skillAreaMapper.toSkillAreaDto(teacherCourse.getSkillArea()))
+        .publicationStatus(resolvePublicationStatus(teacherCourse))
+        .plannedPublicationDateTime(teacherCourse.getPlannedPublicationDateTime())
         .courseCreator(teacherCourse.getCreator()!=null?CourseCreatorDto.builder()
             .userDetails(userMapper.toUserDetail(teacherCourse.getCreator()))
             .skill(teacherCourse.getCreator() != null ?
@@ -173,6 +187,8 @@ public class TeacherCourseMapper {
         .courseUuid(teacherCourse.getUuid()).description(teacherCourse.getDescription())
         .skill(skillMapper.toSkillDto(teacherCourse.getSkill()))
         .skillArea(skillAreaMapper.toSkillAreaDto(teacherCourse.getSkillArea()))
+        .publicationStatus(resolvePublicationStatus(teacherCourse))
+        .plannedPublicationDateTime(teacherCourse.getPlannedPublicationDateTime())
         .courseCreator(teacherCourse.getCreator()!=null?CourseCreatorDto.builder()
             .userDetails(userMapper.toUserDetail(teacherCourse.getCreator()))
             .skill(teacherCourse.getCreator() != null ?
@@ -186,6 +202,18 @@ public class TeacherCourseMapper {
         .lessonCorrection(lessonCorrection!=null?lessonCorrection:null)
 
         .build();
+  }
+
+  private CoursePublicationStatus resolvePublicationStatus(TeacherCourse teacherCourse) {
+    if (teacherCourse == null) {
+      return null;
+    }
+    if (teacherCourse.getPublicationStatus() != null) {
+      return teacherCourse.getPublicationStatus();
+    }
+    return Boolean.TRUE.equals(teacherCourse.getShouldBeDisplayed())
+        ? CoursePublicationStatus.PUBLIE
+        : CoursePublicationStatus.BROUILLON;
   }
 
 }

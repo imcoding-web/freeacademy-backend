@@ -27,7 +27,7 @@ import fr.imcoding.edu365.enumeration.AccountStatus;
 import lombok.RequiredArgsConstructor;
 
 
-@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(origins = {"http://localhost:4200", "http://localhost:4201", "http://localhost:2400"}, allowedHeaders = "*", allowCredentials = "true", maxAge = 3600)
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -43,7 +43,7 @@ public class AuthController {
 	private final UserService userService;
 
 
-	@CrossOrigin
+	@CrossOrigin(origins = {"http://localhost:4200", "http://localhost:4201", "http://localhost:2400"}, allowedHeaders = "*", allowCredentials = "true")
 	@PostMapping("/signin")
 	public ResponseEntity<JwtResponse> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 		User user=userService.getByUserEmail(loginRequest.getEmail());
@@ -81,5 +81,6 @@ public class AuthController {
     return ResponseEntity.ok(newToken);
   }
 }
+
 
 

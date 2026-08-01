@@ -1,4 +1,4 @@
-package fr.imcoding.edu365.business.services;
+﻿package fr.imcoding.edu365.business.services;
 
 import fr.imcoding.edu365.business.mappers.*;
 import fr.imcoding.edu365.business.services.email.EmailService;
@@ -62,7 +62,7 @@ public class TeacherCourseService {
 
 
   public void saveTeacherCourse(TeacherCourseRequest teacherCourseRequest) {
-    //La premiére étape est de persister les medias
+    //La premiÃ©re Ã©tape est de persister les medias
     List<Media> mediaList = new ArrayList<>();
     if (teacherCourseRequest.getFiles() != null && !teacherCourseRequest.getFiles().isEmpty()) {
       teacherCourseRequest.getFiles().forEach(item -> {
@@ -74,11 +74,11 @@ public class TeacherCourseService {
         }
       });
     }
-    // La deuxieme etape est de créer les cours avec les medias
+    // La deuxieme etape est de crÃ©er les cours avec les medias
 
       TeacherCourse teacherCourse = new TeacherCourse();
 
-      if (!teacherCourseRequest.getCreatorEmail().isEmpty()) {
+      if (teacherCourseRequest.getCreatorEmail() != null && !teacherCourseRequest.getCreatorEmail().isBlank()) {
         InformationGiver creator = (InformationGiver) userService
                 .getByUserEmail(teacherCourseRequest.getCreatorEmail());
         if (creator != null) {
@@ -92,13 +92,17 @@ public class TeacherCourseService {
       teacherCourse.setQuarter(teacherCourseRequest.getQuarter());
       teacherCourse.setSkill(skillMapper.toSkill(teacherCourseRequest.getSkill()));
       teacherCourse.setIsPremium(teacherCourseRequest.getIsPremium());
-      teacherCourse.setShouldBeDisplayed(teacherCourseRequest.getShouldBeDisplayed());
       teacherCourse.setSkillArea(skillAreaMapper.toSkillArea(teacherCourseRequest.getSkillArea()));
       //teacherCourse.setSkillAreaSections(teacherCourseRequest.getSkillAreaSections().stream().map(skillAreaSectionRepository::findByCode).collect(Collectors.toList()));
       teacherCourse.setSkillAreaSection(skillAreaSectionMapper.toSkillAreaSection(teacherCourseRequest.getSkillAreaSection()));
       teacherCourse.getMedias().addAll(mediaList);
+      applyTeacherCoursePublicationState(teacherCourse,
+          teacherCourseRequest.getPublicationStatus(),
+          teacherCourseRequest.getShouldBeDisplayed(),
+          teacherCourseRequest.getPlannedPublicationDateTime());
       teacherCourse =  teacherCourseRepository.save(teacherCourse);
-      if(teacherCourse.getShouldBeDisplayed() == true) {
+      if (Boolean.TRUE.equals(teacherCourse.getShouldBeDisplayed())
+          && teacherCourse.getPublicationStatus() == CoursePublicationStatus.PUBLIE) {
         sendNotificationEmailAfterPublishingNewCourse(teacherCourse);
       }
       //teacherCourse.setSkillAreaSection(skillAreaSectionMapper.toSkillAreaSection(teacherCourseRequest.getSkillAreaSection()));
@@ -123,7 +127,39 @@ public class TeacherCourseService {
 
      */
   }
+  private void applyTeacherCoursePublicationState(TeacherCourse teacherCourse,
+      CoursePublicationStatus requestedStatus,
+      Boolean requestedShouldBeDisplayed,
+      LocalDateTime plannedPublicationDateTime) {
+    if (plannedPublicationDateTime != null) {
+      validatePlannedPublicationDateTime(plannedPublicationDateTime);
+      teacherCourse.setPublicationStatus(CoursePublicationStatus.PLANIFIE);
+      teacherCourse.setShouldBeDisplayed(false);
+      teacherCourse.setPlannedPublicationDateTime(plannedPublicationDateTime);
+      return;
+    }
 
+    if (requestedStatus == CoursePublicationStatus.PLANIFIE) {
+      throw new BadRequestException("Une date de publication est obligatoire pour planifier un cours");
+    }
+
+    if (requestedStatus == CoursePublicationStatus.PUBLIE || Boolean.TRUE.equals(requestedShouldBeDisplayed)) {
+      teacherCourse.setPublicationStatus(CoursePublicationStatus.PUBLIE);
+      teacherCourse.setShouldBeDisplayed(true);
+      teacherCourse.setPlannedPublicationDateTime(null);
+      return;
+    }
+
+    teacherCourse.setPublicationStatus(CoursePublicationStatus.BROUILLON);
+    teacherCourse.setShouldBeDisplayed(false);
+    teacherCourse.setPlannedPublicationDateTime(null);
+  }
+
+  private void validatePlannedPublicationDateTime(LocalDateTime plannedPublicationDateTime) {
+    if (!plannedPublicationDateTime.isAfter(LocalDateTime.now())) {
+      throw new BadRequestException("La date de publication planifiée doit être dans le futur");
+    }
+  }
   public void sendNotificationEmailAfterPublishingNewCourse(TeacherCourse teacherCourse) {
 
     Map<String, Object> maps = new HashMap<>();
@@ -178,12 +214,16 @@ public class TeacherCourseService {
     TeacherCourse courseToUpdate = teacherCourseRepository
         .findByUuid(courseId).orElse(null);
     if(courseToUpdate != null) {
-      if((courseToUpdate.getShouldBeDisplayed() == null || courseToUpdate.getShouldBeDisplayed() == false) && shouldBeDisplayed == true) {
+      if((courseToUpdate.getShouldBeDisplayed() == null || courseToUpdate.getShouldBeDisplayed() == false) && Boolean.TRUE.equals(shouldBeDisplayed)) {
         sendNotificationEmailAfterPublishingNewCourse(courseToUpdate);
       }
       courseToUpdate.setShouldBeDisplayed(shouldBeDisplayed);
-      if(shouldBeDisplayed) {
-        courseToUpdate.setCreatedAt(new Date());
+      if(Boolean.TRUE.equals(shouldBeDisplayed)) {
+        courseToUpdate.setPublicationStatus(CoursePublicationStatus.PUBLIE);
+        courseToUpdate.setPlannedPublicationDateTime(null);
+      } else {
+        courseToUpdate.setPublicationStatus(CoursePublicationStatus.BROUILLON);
+        courseToUpdate.setPlannedPublicationDateTime(null);
       }
       teacherCourseRepository.save(courseToUpdate);
     }
@@ -195,6 +235,7 @@ public class TeacherCourseService {
     List<Media> newMediaList = new ArrayList<>();
     TeacherCourse courseToUpdate = teacherCourseRepository
         .findByUuid(teacherCourseRequest.getCourseUuid()).orElse(null);
+    Boolean wasDisplayed = courseToUpdate != null && Boolean.TRUE.equals(courseToUpdate.getShouldBeDisplayed());
     courseToUpdate.setTitle(teacherCourseRequest.getTitle());
     courseToUpdate.setType(teacherCourseRequest.getType());
     courseToUpdate.setDescription(teacherCourseRequest.getDescription());
@@ -204,7 +245,15 @@ public class TeacherCourseService {
 
     //courseToUpdate.setSkillAreaSections(teacherCourseRequest.getSkillAreaSections().stream().map(skillAreaSectionRepository::findByCode).collect(Collectors.toList()));
     courseToUpdate.setSkillAreaSection(skillAreaSectionMapper.toSkillAreaSection(teacherCourseRequest.getSkillAreaSection()));
-    if (!teacherCourseRequest.getCreatorEmail().isEmpty()) {
+    if (teacherCourseRequest.getPublicationStatus() != null
+        || teacherCourseRequest.getShouldBeDisplayed() != null
+        || teacherCourseRequest.getPlannedPublicationDateTime() != null) {
+      applyTeacherCoursePublicationState(courseToUpdate,
+          teacherCourseRequest.getPublicationStatus(),
+          teacherCourseRequest.getShouldBeDisplayed(),
+          teacherCourseRequest.getPlannedPublicationDateTime());
+    }
+    if (teacherCourseRequest.getCreatorEmail() != null && !teacherCourseRequest.getCreatorEmail().isBlank()) {
       InformationGiver creator = (InformationGiver) userService
           .getByUserEmail(teacherCourseRequest.getCreatorEmail());
       if (creator != null) {
@@ -236,13 +285,26 @@ public class TeacherCourseService {
       });
       courseToUpdate.getMedias().addAll(newMediaList);
     }
-    if(courseToUpdate.getShouldBeDisplayed() == false && teacherCourseRequest.getShouldBeDisplayed() == true) {
+    if (!wasDisplayed && Boolean.TRUE.equals(courseToUpdate.getShouldBeDisplayed())
+        && courseToUpdate.getPublicationStatus() == CoursePublicationStatus.PUBLIE) {
       sendNotificationEmailAfterPublishingNewCourse(courseToUpdate);
     }
-    courseToUpdate.setShouldBeDisplayed(teacherCourseRequest.getShouldBeDisplayed());
     TeacherCourse project = teacherCourseRepository.save(courseToUpdate);
 
     return project;
+  }
+  public TeacherCourseResponse updateTeacherCoursePublicationSchedule(UUID courseUuid,
+      LocalDateTime plannedPublicationDateTime) {
+    TeacherCourse courseToUpdate = teacherCourseRepository.findByUuid(courseUuid).orElse(null);
+    if (courseToUpdate == null) {
+      throw new BadRequestException("Cours introuvable");
+    }
+    applyTeacherCoursePublicationState(courseToUpdate,
+        plannedPublicationDateTime == null ? CoursePublicationStatus.BROUILLON : CoursePublicationStatus.PLANIFIE,
+        false,
+        plannedPublicationDateTime);
+    TeacherCourse savedCourse = teacherCourseRepository.save(courseToUpdate);
+    return teacherCourseMapper.toTeacherCourseResponse(savedCourse);
   }
 
   public List<Media> checkMediaTeacherCourse(UUID projectUuid, List<MediaDto> newMediaList) {
@@ -261,6 +323,17 @@ public class TeacherCourseService {
   }
 
   @Transactional
+  public void publishDueScheduledCourses() {
+    List<TeacherCourse> dueCourses = teacherCourseRepository
+        .findByPublicationStatusAndPlannedPublicationDateTimeLessThanEqual(CoursePublicationStatus.PLANIFIE, LocalDateTime.now());
+    dueCourses.forEach(course -> {
+      course.setPublicationStatus(CoursePublicationStatus.PUBLIE);
+      course.setShouldBeDisplayed(true);
+      teacherCourseRepository.save(course);
+      sendNotificationEmailAfterPublishingNewCourse(course);
+    });
+  }
+
   public List<TeacherCourseDetails> getLast6Course(){
   return teacherCourseRepository.findTop6ByOrderByCreatedAtDesc().stream().map(teacherCourseMapper::toTeacherCourseDetails).collect(Collectors.toList());
   }
@@ -273,6 +346,13 @@ public class TeacherCourseService {
       user = null;
     }
     TeacherCourse teacherCourse = getByUuid(uuid);
+    if (teacherCourse == null) {
+      return null;
+    }
+    if (!Boolean.TRUE.equals(teacherCourse.getShouldBeDisplayed())
+        && teacherCourse.getPublicationStatus() != CoursePublicationStatus.PUBLIE) {
+      return null;
+    }
     traceTeacherCourseService.addTeacherCourseAccessTracability(teacherCourse, user);
     if (teacherCourse.getIsPremium()) {
       InformationSeeker student = (InformationSeeker) userService.getCurrentUser();
@@ -289,9 +369,6 @@ public class TeacherCourseService {
 
     return teacherCourseMapper.toTeacherCourseResponse(teacherCourse, lessonCorrection);
   }
-
-  @Transactional
-  public PageDto<TeacherCourseDetails> filterCourses( Integer page,
        Integer offset, String skill,CourseType type,Quarter quarter){
 	if (page <= 0) {
 	  throw new BadRequestException("page Index should be greater or equals than 1");
@@ -303,7 +380,7 @@ public class TeacherCourseService {
     // Si l'utilisateur a une section specifique au niveaud e son niveau d'etude
     if(user.getCurrentLevelSection() != null) {
       TeacherCourseSearchCriteria courseSearchCriteria =
-              new TeacherCourseSearchCriteria(user.getCurrentLevel().getSkillAreaCode(),user.getCurrentLevelSection().getCode(), skill, type, quarter, true);
+              new TeacherCourseSearchCriteria(user.getCurrentLevel().getSkillAreaCode(),user.getCurrentLevelSection().getCode(), skill, type, quarter, true, null);
       Pageable pageable = PageRequest.of(page-1 , offset, Sort.by("createdAt").ascending());
       Page<TeacherCourse> teacherCoursePage = null;
       teacherCoursePage =
@@ -314,7 +391,7 @@ public class TeacherCourseService {
     } // Si l'utilisateur n'a pas une section specifique au niveaud e son niveau d'etude
     else if(user.getCurrentLevel() != null) {
         TeacherCourseSearchCriteria courseSearchCriteria =
-                new TeacherCourseSearchCriteria(user.getCurrentLevel().getSkillAreaCode(),null, skill, type, quarter, true);
+                new TeacherCourseSearchCriteria(user.getCurrentLevel().getSkillAreaCode(),null, skill, type, quarter, true, null);
       Pageable pageable = PageRequest.of(page-1 , offset, Sort.by("createdAt").ascending());
       Page<TeacherCourse> teacherCoursePage = null;
       teacherCoursePage =
@@ -335,7 +412,7 @@ public class TeacherCourseService {
     long totalElementsSize = 0l;
     List<TeacherCourse> courses = new ArrayList<>();
     TeacherCourseSearchCriteria courseSearchCriteria =
-        new TeacherCourseSearchCriteria(skillAreaCode,sectionCode, skillLabel, type, quarter, null);
+        new TeacherCourseSearchCriteria(skillAreaCode,sectionCode, skillLabel, type, quarter, null, null);
     Pageable pageable = PageRequest.of(0 , 10000, Sort.by("createdAt").ascending());
     Page<TeacherCourse> teacherCoursePage = null;
     teacherCoursePage =

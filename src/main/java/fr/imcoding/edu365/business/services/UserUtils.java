@@ -14,24 +14,21 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class UserUtils {
-private final MediaDatailsMapper mediaDatailsMapper;
+  private final MediaDatailsMapper mediaDatailsMapper;
 
- public MediaDetails getPictureProfile(User user){
-   return  mediaDatailsMapper.toMediaDetails(user.getMedias().stream()
-       .filter(media -> media.getMediaContext() == MediaContext.PICTURE_PROFIL)
-       .findFirst().orElse(null));
-
- }
-
-  public MediaDetails getPictureCover(User user){
-    return  mediaDatailsMapper.toMediaDetails(user.getMedias().stream()
-        .filter(media -> media.getMediaContext() == MediaContext.PICTURE_COVER)
-        .findFirst().orElse(null));
-
+  public MediaDetails getPictureProfile(User user) {
+    return user != null && user.getMedias() != null
+        ? mediaDatailsMapper.toMediaDetails(user.getMedias().stream()
+            .filter(media -> media.getMediaContext() == MediaContext.PICTURE_PROFIL)
+            .findFirst().orElse(null))
+        : null;
   }
 
-
-
-
-
+  public MediaDetails getPictureCover(User user) {
+    return user != null && user.getMedias() != null
+        ? mediaDatailsMapper.toMediaDetails(user.getMedias().stream()
+            .filter(media -> media.getMediaContext() == MediaContext.PICTURE_COVER)
+            .findFirst().orElse(null))
+        : null;
+  }
 }

@@ -32,7 +32,7 @@ import fr.imcoding.edu365.persistence.entities.User;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:4201", allowedHeaders = "*", allowCredentials = "true")
 @RequestMapping("/user")
 @RequiredArgsConstructor
 public class UserController {

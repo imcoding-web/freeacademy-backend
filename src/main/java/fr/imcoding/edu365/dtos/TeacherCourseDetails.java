@@ -1,9 +1,11 @@
-package fr.imcoding.edu365.dtos;
+﻿package fr.imcoding.edu365.dtos;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import fr.imcoding.edu365.enumeration.CoursePublicationStatus;
 import fr.imcoding.edu365.enumeration.CourseType;
 import fr.imcoding.edu365.enumeration.Quarter;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -35,5 +37,7 @@ public class TeacherCourseDetails {
   private Boolean isPremium;
   private Boolean canBeOpened;
   private String section;
+  private CoursePublicationStatus publicationStatus;
+  private LocalDateTime plannedPublicationDateTime;
 
 }
