@@ -1,4 +1,4 @@
-﻿package fr.imcoding.edu365.enumeration;
+package fr.imcoding.edu365.enumeration;
 
 /**
  * Publication lifecycle for teacher courses.

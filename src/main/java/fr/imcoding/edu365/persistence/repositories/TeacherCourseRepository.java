@@ -1,4 +1,4 @@
-﻿package fr.imcoding.edu365.persistence.repositories;
+package fr.imcoding.edu365.persistence.repositories;
 
 import fr.imcoding.edu365.enumeration.CoursePublicationStatus;
 import fr.imcoding.edu365.enumeration.CourseType;

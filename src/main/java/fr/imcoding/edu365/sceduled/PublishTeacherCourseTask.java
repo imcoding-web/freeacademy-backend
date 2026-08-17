@@ -1,4 +1,4 @@
-﻿package fr.imcoding.edu365.sceduled;
+package fr.imcoding.edu365.sceduled;
 
 import fr.imcoding.edu365.business.services.TeacherCourseService;
 import lombok.RequiredArgsConstructor;

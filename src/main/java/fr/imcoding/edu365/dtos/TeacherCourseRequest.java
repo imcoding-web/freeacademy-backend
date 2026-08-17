@@ -1,4 +1,4 @@
-﻿package fr.imcoding.edu365.dtos;
+package fr.imcoding.edu365.dtos;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import fr.imcoding.edu365.enumeration.CoursePublicationStatus;

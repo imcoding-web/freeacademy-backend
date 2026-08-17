@@ -17,19 +17,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-@Service
 @Slf4j
-public class DBFileStorageService {
+public class DBFileStorageService implements FilesStorageService {
 
   private Path fileStorageLocation;
   private MediaService mediaService;
 
   @Value("${file.upload-dir}")
   private String uploadDir;
-
 
   @PostConstruct
   private void postConstruct() throws Exception {
@@ -43,14 +40,40 @@ public class DBFileStorageService {
     }
   }
 
-  public String storeFile(MultipartFile file) throws Exception {
-    // crate direcory
+  @Override
+  public void save(MultipartFile file, String fileStorageName, String path) {
+    try {
+      Path targetLocation = this.fileStorageLocation.resolve(fileStorageName);
+      Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+    } catch (IOException ex) {
+      throw new RuntimeException("Could not store file " + fileStorageName + ". Please try again!", ex);
+    }
+  }
 
-    // Normalize file name
-    // String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+  @Override
+  public byte[] load(String filePath) {
+    try {
+      Path file = this.fileStorageLocation.resolve(filePath).normalize();
+      return Files.readAllBytes(file);
+    } catch (IOException ex) {
+      throw new RuntimeException("Could not read file " + filePath + ". Please try again!", ex);
+    }
+  }
 
+  @Override
+  public void deleteFile(String filePath) {
+    try {
+      Path file = this.fileStorageLocation.resolve(filePath).normalize();
+      Files.deleteIfExists(file);
+    } catch (IOException ex) {
+      throw new RuntimeException("Could not delete file " + filePath + ". Please try again!", ex);
+    }
+  }
+
+  @Override
+  public String storeFile(MultipartFile file) {
     String[] splitName = file.getOriginalFilename().split("\\.");
-    String extension = null;
+    String extension;
     if (splitName.length != 0) {
       extension = splitName[splitName.length - 1];
     } else {
@@ -60,18 +83,15 @@ public class DBFileStorageService {
     String fileName = RandomStringUtils.random(10, true, true) + "." + extension;
 
     try {
-      // Check if the file's name contains invalid characters
       if (fileName.contains("..")) {
-        throw new Exception("Sorry! Filename contains invalid path sequence " + fileName);
+        throw new RuntimeException("Sorry! Filename contains invalid path sequence " + fileName);
       }
 
-      // Copy file to the target location (Replacing existing file with the same name)
       Path targetLocation = this.fileStorageLocation.resolve(fileName);
       Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
-
       return fileName;
     } catch (IOException ex) {
-      throw new Exception("Could not store file " + fileName + ". Please try again!", ex);
+      throw new RuntimeException("Could not store file " + fileName + ". Please try again!", ex);
     }
   }
 
@@ -92,7 +112,6 @@ public class DBFileStorageService {
   public String storePdfFile(String resourceName, byte[] pdfFile) throws Exception {
     String fileName = resourceName + ".pdf";
     try {
-      // Copy file to the target location (Replacing existing file with the same name)
       Path targetLocation = this.fileStorageLocation.resolve(fileName);
       Files.copy(new ByteArrayInputStream(pdfFile), targetLocation,
           StandardCopyOption.REPLACE_EXISTING);
@@ -108,7 +127,6 @@ public class DBFileStorageService {
     try {
       Path filePath = this.fileStorageLocation.resolve(media.getMediaLabel()).normalize();
       Files.delete(filePath);
-      //mediaService.deleteMedia(media.getId());
     } catch (NoSuchFileException x) {
       log.error("%s: no such" + " file", media.getMediaLabel());
     } catch (IOException x) {
@@ -116,8 +134,7 @@ public class DBFileStorageService {
     }
   }
 
-  public Path getAbsolutePath(String fileName){
-
+  public Path getAbsolutePath(String fileName) {
     Path filePath = this.fileStorageLocation.resolve(fileName).normalize();
     return filePath;
   }

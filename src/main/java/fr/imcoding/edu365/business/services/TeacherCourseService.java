@@ -1,8 +1,7 @@
-﻿package fr.imcoding.edu365.business.services;
+package fr.imcoding.edu365.business.services;
 
 import fr.imcoding.edu365.business.mappers.*;
 import fr.imcoding.edu365.business.services.email.EmailService;
-import fr.imcoding.edu365.business.services.files.DBFileStorageService;
 import fr.imcoding.edu365.business.services.files.FilesStorageService;
 import fr.imcoding.edu365.dtos.*;
 import fr.imcoding.edu365.enumeration.*;
@@ -62,7 +61,7 @@ public class TeacherCourseService {
 
 
   public void saveTeacherCourse(TeacherCourseRequest teacherCourseRequest) {
-    //La premiÃ©re Ã©tape est de persister les medias
+    //La premiÃƒÂ©re ÃƒÂ©tape est de persister les medias
     List<Media> mediaList = new ArrayList<>();
     if (teacherCourseRequest.getFiles() != null && !teacherCourseRequest.getFiles().isEmpty()) {
       teacherCourseRequest.getFiles().forEach(item -> {
@@ -74,11 +73,11 @@ public class TeacherCourseService {
         }
       });
     }
-    // La deuxieme etape est de crÃ©er les cours avec les medias
+    // La deuxieme etape est de crÃƒÂ©er les cours avec les medias
 
       TeacherCourse teacherCourse = new TeacherCourse();
 
-      if (teacherCourseRequest.getCreatorEmail() != null && !teacherCourseRequest.getCreatorEmail().isBlank()) {
+      if (teacherCourseRequest.getCreatorEmail() != null && !teacherCourseRequest.getCreatorEmail().trim().isEmpty()) {
         InformationGiver creator = (InformationGiver) userService
                 .getByUserEmail(teacherCourseRequest.getCreatorEmail());
         if (creator != null) {
@@ -157,7 +156,7 @@ public class TeacherCourseService {
 
   private void validatePlannedPublicationDateTime(LocalDateTime plannedPublicationDateTime) {
     if (!plannedPublicationDateTime.isAfter(LocalDateTime.now())) {
-      throw new BadRequestException("La date de publication planifiée doit être dans le futur");
+      throw new BadRequestException("La date de publication planifiÃ©e doit Ãªtre dans le futur");
     }
   }
   public void sendNotificationEmailAfterPublishingNewCourse(TeacherCourse teacherCourse) {
@@ -253,7 +252,7 @@ public class TeacherCourseService {
           teacherCourseRequest.getShouldBeDisplayed(),
           teacherCourseRequest.getPlannedPublicationDateTime());
     }
-    if (teacherCourseRequest.getCreatorEmail() != null && !teacherCourseRequest.getCreatorEmail().isBlank()) {
+    if (teacherCourseRequest.getCreatorEmail() != null && !teacherCourseRequest.getCreatorEmail().trim().isEmpty()) {
       InformationGiver creator = (InformationGiver) userService
           .getByUserEmail(teacherCourseRequest.getCreatorEmail());
       if (creator != null) {
@@ -369,10 +368,11 @@ public class TeacherCourseService {
 
     return teacherCourseMapper.toTeacherCourseResponse(teacherCourse, lessonCorrection);
   }
-       Integer offset, String skill,CourseType type,Quarter quarter){
-	if (page <= 0) {
-	  throw new BadRequestException("page Index should be greater or equals than 1");
-	}
+  public PageDto<TeacherCourseDetails> filterCourses(Integer page,
+      Integer offset, String skill,CourseType type,Quarter quarter){
+    if (page <= 0) {
+      throw new BadRequestException("page Index should be greater or equals than 1");
+    }
 
     InformationSeeker user=(InformationSeeker) userService.getCurrentUser();
     long totalElementsSize = 0l;
@@ -442,3 +442,4 @@ public class TeacherCourseService {
 
 
   }
+

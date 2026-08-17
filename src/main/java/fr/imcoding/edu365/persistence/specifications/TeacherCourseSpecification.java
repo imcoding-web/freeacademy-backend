@@ -1,4 +1,4 @@
-﻿package fr.imcoding.edu365.persistence.specifications;
+package fr.imcoding.edu365.persistence.specifications;
 
 import fr.imcoding.edu365.dtos.TeacherCourseSearchCriteria;
 import fr.imcoding.edu365.enumeration.CoursePublicationStatus;

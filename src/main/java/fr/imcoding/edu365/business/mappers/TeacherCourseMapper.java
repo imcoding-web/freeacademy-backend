@@ -1,4 +1,4 @@
-﻿package fr.imcoding.edu365.business.mappers;
+package fr.imcoding.edu365.business.mappers;
 
 import fr.imcoding.edu365.persistence.entities.SkillSubscription;
 import fr.imcoding.edu365.persistence.repositories.SkillSubscriptionRepository;

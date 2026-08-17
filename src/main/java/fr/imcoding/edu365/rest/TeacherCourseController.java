@@ -1,4 +1,4 @@
-﻿package fr.imcoding.edu365.rest;
+package fr.imcoding.edu365.rest;
 
 import fr.imcoding.edu365.business.services.LessonCorrectionService;
 import fr.imcoding.edu365.business.services.TeacherCourseCorrectionService;

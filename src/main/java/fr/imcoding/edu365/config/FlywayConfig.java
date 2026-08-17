@@ -1,10 +1,12 @@
 package fr.imcoding.edu365.config;
 
 import org.flywaydb.core.Flyway;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.flyway.FlywayMigrationInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.Profile;
 
 /**
  * Flyway migration configuration
@@ -12,6 +14,8 @@ import org.springframework.context.annotation.DependsOn;
  * @author mdh
  */
 @Configuration
+@Profile({"prod", "stage", "preprod1", "preprod2", "aws"})
+@ConditionalOnProperty(prefix = "edu365.flyway", name = "delayed-init", havingValue = "true")
 public class FlywayConfig {
 
   /**

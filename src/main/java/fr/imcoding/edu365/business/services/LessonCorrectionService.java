@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import fr.imcoding.edu365.business.mappers.LessonCorrectionMapper;
-import fr.imcoding.edu365.business.services.files.DBFileStorageService;
 import fr.imcoding.edu365.dtos.LessonCorrectionRequest;
 import fr.imcoding.edu365.dtos.LessonCorrectionResponse;
 import fr.imcoding.edu365.dtos.MediaDto;
@@ -120,3 +119,4 @@ public class LessonCorrectionService {
     return mediaList;
   }
 }
+

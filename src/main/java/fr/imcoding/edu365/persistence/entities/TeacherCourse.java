@@ -1,4 +1,4 @@
-﻿package fr.imcoding.edu365.persistence.entities;
+package fr.imcoding.edu365.persistence.entities;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import fr.imcoding.edu365.enumeration.CoursePublicationStatus;
